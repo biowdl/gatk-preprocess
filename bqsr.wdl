@@ -1,6 +1,6 @@
-import "wdl-tasks/gatk.wdl" as gatk
-import "wdl-tasks/biopet.wdl" as biopet
-import "wdl-tasks/picard.wdl" as picard
+import "tasks/gatk.wdl" as gatk
+import "tasks/biopet.wdl" as biopet
+import "tasks/picard.wdl" as picard
 
 workflow BaseRecalibration {
     File bamFile
