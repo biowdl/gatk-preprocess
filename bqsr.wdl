@@ -9,6 +9,7 @@ workflow BaseRecalibration {
     File ref_fasta
     File ref_dict
     File ref_fasta_index
+    Boolean? splitSplicedReads
 
     call biopet.ScatterRegions as scatterList {
         input:
@@ -18,14 +19,26 @@ workflow BaseRecalibration {
     }
 
     scatter (bed in scatterList.scatters) {
+        if (splitSplicedReads) {
+            call gatk.SplitNCigarReads as splitNCigarReads{
+                input:
+                    intervals = [bed],
+                    ref_fasta = ref_fasta,
+                    ref_dict = ref_dict,
+                    ref_fasta_index = ref_fasta_index,
+                    input_bam = bamFile,
+                    output_bam = sub(basename(bamFile), ".bam$", "." + basename(bed) + ".bam")
+            }
+        }
+
         call gatk.BaseRecalibrator as baseRecalibrator {
             input:
                 sequence_group_interval = [bed],
                 ref_fasta = ref_fasta,
                 ref_dict = ref_dict,
                 ref_fasta_index = ref_fasta_index,
-                input_bam = bamFile,
-                input_bam_index = bamIndex,
+                input_bam = if splitSplicedReads then splitNCigarReads.bam else bamFile,
+                input_bam_index = if splitSplicedReads then splitNCigarReads.bam_index else bamIndex,
                 recalibration_report_filename = sub(basename(bamFile), ".bam$", ".bqsr")
         }
     }
