@@ -2,7 +2,7 @@ import "tasks/gatk.wdl" as gatk
 import "tasks/biopet.wdl" as biopet
 import "tasks/picard.wdl" as picard
 
-workflow BaseRecalibration {
+workflow GatkPreprocess {
     File bamFile
     File bamIndex
     String outputBamPath
