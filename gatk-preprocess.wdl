@@ -22,7 +22,7 @@ workflow GatkPreprocess {
     Boolean splitSplicedReads2 = select_first([splitSplicedReads, false])
     scatter (bed in scatterList.scatters) {
         if (splitSplicedReads2) {
-            call gatk.SplitNCigarReads as splitNCigarReads{
+            call gatk.SplitNCigarReads as splitNCigarReads {
                 input:
                     intervals = [bed],
                     ref_fasta = ref_fasta,
@@ -39,8 +39,8 @@ workflow GatkPreprocess {
                 ref_fasta = ref_fasta,
                 ref_dict = ref_dict,
                 ref_fasta_index = ref_fasta_index,
-                input_bam = if splitSplicedReads then splitNCigarReads.bam else bamFile,
-                input_bam_index = if splitSplicedReads then splitNCigarReads.bam_index else bamIndex,
+                input_bam = if splitSplicedReads2 then splitNCigarReads.bam else bamFile,
+                input_bam_index = if splitSplicedReads2 then splitNCigarReads.bam_index else bamIndex,
                 recalibration_report_filename = sub(basename(bamFile), ".bam$", ".bqsr")
         }
     }
