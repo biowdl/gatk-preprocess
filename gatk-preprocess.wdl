@@ -19,7 +19,7 @@ workflow GatkPreprocess {
     }
 
     scatter (bed in scatterList.scatters) {
-        if (splitSplicedReads) {
+        if (select_first([splitSplicedReads, false])) {
             call gatk.SplitNCigarReads as splitNCigarReads{
                 input:
                     intervals = [bed],
