@@ -19,7 +19,7 @@ workflow GatkPreprocess {
             outputDirPath = "."
     }
 
-    Boolean splitSplicedReads2 = if defined(splitSplicedReads) then select_first(splitSplicedReads) else false
+    Boolean splitSplicedReads2 = if defined(splitSplicedReads) then select_first([splitSplicedReads]) else false
     scatter (bed in scatterList.scatters) {
         if (splitSplicedReads2) {
             call gatk.SplitNCigarReads as splitNCigarReads{
