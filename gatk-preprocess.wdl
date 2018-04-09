@@ -11,6 +11,7 @@ workflow GatkPreprocess {
     File ref_fasta_index
     Boolean? splitSplicedReads
 
+
     call biopet.ScatterRegions as scatterList {
         input:
             ref_fasta = ref_fasta,
@@ -18,8 +19,9 @@ workflow GatkPreprocess {
             outputDirPath = "."
     }
 
+    Boolean splitSplicedReads2 = if defined(splitSplicedReads) then select_first(splitSplicedReads) else false
     scatter (bed in scatterList.scatters) {
-        if (select_first([splitSplicedReads, false])) {
+        if (splitSplicedReads2) {
             call gatk.SplitNCigarReads as splitNCigarReads{
                 input:
                     intervals = [bed],
