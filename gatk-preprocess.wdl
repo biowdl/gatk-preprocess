@@ -48,6 +48,7 @@ workflow GatkPreprocess {
                     ref_dict = ref_dict,
                     ref_fasta_index = ref_fasta_index,
                     input_bam = bamFile,
+                    input_bam_index= bamIndex,
                     output_bam = sub(basename(bamFile), ".bam$", "." + basename(bed) + ".bam")
                 }
             }
