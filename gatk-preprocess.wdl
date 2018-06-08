@@ -6,29 +6,30 @@ workflow GatkPreprocess {
     File bamFile
     File bamIndex
     String outputBamPath
-    File ref_fasta
-    File ref_dict
-    File ref_fasta_index
+    File refFasta
+    File refDict
+    File refFastaIndex
     Boolean? splitSplicedReads
 
+    String scatterDir = sub(outputBamPath, basename(outputBamPath), "/scatter/")
 
     call biopet.ScatterRegions as scatterList {
         input:
-            ref_fasta = ref_fasta,
-            ref_dict = ref_dict,
-            outputDirPath = "."
+            ref_fasta = refFasta,
+            ref_dict = refDict,
+            outputDirPath = scatterDir
     }
 
     scatter (bed in scatterList.scatters) {
            call gatk.BaseRecalibrator as baseRecalibrator {
             input:
                 sequence_group_interval = [bed],
-                ref_fasta = ref_fasta,
-                ref_dict = ref_dict,
-                ref_fasta_index = ref_fasta_index,
+                ref_fasta = refFasta,
+                ref_dict = refDict,
+                ref_fasta_index = refFastaIndex,
                 input_bam = bamFile,
                 input_bam_index = bamIndex,
-                recalibration_report_filename = sub(basename(bamFile), ".bam$", ".bqsr")
+                recalibration_report_filename = scatterDir + "/" + basename(bed) + ".bqsr"
         }
     }
 
@@ -44,27 +45,27 @@ workflow GatkPreprocess {
             call gatk.SplitNCigarReads as splitNCigarReads {
                 input:
                     intervals = [bed],
-                    ref_fasta = ref_fasta,
-                    ref_dict = ref_dict,
-                    ref_fasta_index = ref_fasta_index,
-                    input_bam = bamFile,
-                    input_bam_index= bamIndex,
-                    output_bam = sub(basename(bamFile), ".bam$", "." + basename(bed) + ".bam")
-                }
+                    refFasta = refFasta,
+                    refDict = refDict,
+                    refFastaIndex = refFastaIndex,
+                    inputBam = bamFile,
+                    inputBamIndex= bamIndex,
+                    outputBam = scatterDir + "/" + basename(bed) + ".split.bam"
             }
+        }
 
         call gatk.ApplyBQSR as applyBqsr {
             input:
                 sequence_group_interval = [bed],
-                ref_fasta = ref_fasta,
-                ref_dict = ref_dict,
-                ref_fasta_index = ref_fasta_index,
-                input_bam = if splitSplicedReads2 then select_first([splitNCigarReads.bam]) else bamFile,
+                ref_fasta = refFasta,
+                ref_dict = refDict,
+                ref_fasta_index = refFastaIndex,
+                input_bam = if splitSplicedReads2
+                    then select_first([splitNCigarReads.bam])
+                    else bamFile,
                 recalibration_report = gatherBqsr.output_bqsr_report,
-                output_bam_path = sub(basename(bamFile), ".bam$", ".bqsr.bam")
+                output_bam_path = scatterDir + "/" + basename(bed) + ".bqsr.bam"
         }
-
-
     }
 
     call picard.GatherBamFiles as gatherBamFiles {
