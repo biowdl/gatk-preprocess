@@ -1,5 +1,5 @@
-import "tasks/gatk.wdl" as gatk
 import "tasks/biopet.wdl" as biopet
+import "tasks/gatk.wdl" as gatk
 import "tasks/picard.wdl" as picard
 
 workflow GatkPreprocess {
@@ -11,7 +11,8 @@ workflow GatkPreprocess {
     File refFastaIndex
     Boolean? splitSplicedReads
 
-    String scatterDir = sub(outputBamPath, basename(outputBamPath), "/scatter/")
+    String outputDir = sub(outputBamPath, basename(outputBamPath), "")
+    String scatterDir = outputDir +  "/scatter/"
 
     call biopet.ScatterRegions as scatterList {
         input:
@@ -36,7 +37,7 @@ workflow GatkPreprocess {
     call gatk.GatherBqsrReports as gatherBqsr {
         input:
             inputBQSRreports = baseRecalibrator.recalibrationReport,
-            outputReportPath = sub(bamFile, ".bam$", ".bqsr")
+            outputReportPath = outputDir + "/" + sub(basename(bamFile), ".bam$", ".bqsr")
     }
 
     Boolean splitSplicedReads2 = select_first([splitSplicedReads, false])
