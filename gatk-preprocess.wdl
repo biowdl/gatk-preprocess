@@ -21,22 +21,22 @@ workflow GatkPreprocess {
     }
 
     scatter (bed in scatterList.scatters) {
-           call gatk.BaseRecalibrator as baseRecalibrator {
+        call gatk.BaseRecalibrator as baseRecalibrator {
             input:
-                sequence_group_interval = [bed],
-                ref_fasta = refFasta,
-                ref_dict = refDict,
-                ref_fasta_index = refFastaIndex,
-                input_bam = bamFile,
-                input_bam_index = bamIndex,
-                recalibration_report_filename = scatterDir + "/" + basename(bed) + ".bqsr"
+                sequenceGroupInterval = [bed],
+                refFasta = refFasta,
+                refDict = refDict,
+                refFastaIndex = refFastaIndex,
+                inputBam = bamFile,
+                inputBamIndex = bamIndex,
+                recalibrationReportPath = scatterDir + "/" + basename(bed) + ".bqsr"
         }
     }
 
     call gatk.GatherBqsrReports as gatherBqsr {
         input:
-            input_bqsr_reports = baseRecalibrator.recalibration_report,
-            output_report_filepath = sub(bamFile, ".bam$", ".bqsr")
+            inputBQSRreports = baseRecalibrator.recalibrationReport,
+            outputReportPath = sub(bamFile, ".bam$", ".bqsr")
     }
 
     Boolean splitSplicedReads2 = select_first([splitSplicedReads, false])
@@ -56,15 +56,15 @@ workflow GatkPreprocess {
 
         call gatk.ApplyBQSR as applyBqsr {
             input:
-                sequence_group_interval = [bed],
-                ref_fasta = refFasta,
-                ref_dict = refDict,
-                ref_fasta_index = refFastaIndex,
-                input_bam = if splitSplicedReads2
+                sequenceGroupInterval = [bed],
+                refFasta = refFasta,
+                refDict = refDict,
+                refFastaIndex = refFastaIndex,
+                inputBam = if splitSplicedReads2
                     then select_first([splitNCigarReads.bam])
                     else bamFile,
-                recalibration_report = gatherBqsr.output_bqsr_report,
-                output_bam_path = scatterDir + "/" + basename(bed) + ".bqsr.bam"
+                recalibrationReport = gatherBqsr.outputBQSRreport,
+                outputBamPath = scatterDir + "/" + basename(bed) + ".bqsr.bam"
         }
     }
 
