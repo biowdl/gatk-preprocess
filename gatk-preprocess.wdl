@@ -63,6 +63,9 @@ workflow GatkPreprocess {
                 inputBam = if splitSplicedReads2
                     then select_first([splitNCigarReads.bam])
                     else bamFile,
+                inputBamIndex = if splitSplicedReads2
+                    then select_first([splitNCigarReads.bamIndex])
+                    else bamIndex,
                 recalibrationReport = gatherBqsr.outputBQSRreport,
                 outputBamPath = scatterDir + "/" + basename(bed) + ".bqsr.bam"
         }
