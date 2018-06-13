@@ -1,41 +1,43 @@
-import "tasks/gatk.wdl" as gatk
 import "tasks/biopet.wdl" as biopet
+import "tasks/gatk.wdl" as gatk
 import "tasks/picard.wdl" as picard
 
 workflow GatkPreprocess {
     File bamFile
     File bamIndex
     String outputBamPath
-    File ref_fasta
-    File ref_dict
-    File ref_fasta_index
+    File refFasta
+    File refDict
+    File refFastaIndex
     Boolean? splitSplicedReads
 
+    String outputDir = sub(outputBamPath, basename(outputBamPath), "")
+    String scatterDir = outputDir +  "/scatter/"
 
     call biopet.ScatterRegions as scatterList {
         input:
-            ref_fasta = ref_fasta,
-            ref_dict = ref_dict,
-            outputDirPath = "."
+            refFasta = refFasta,
+            refDict = refDict,
+            outputDirPath = scatterDir
     }
 
     scatter (bed in scatterList.scatters) {
-           call gatk.BaseRecalibrator as baseRecalibrator {
+        call gatk.BaseRecalibrator as baseRecalibrator {
             input:
-                sequence_group_interval = [bed],
-                ref_fasta = ref_fasta,
-                ref_dict = ref_dict,
-                ref_fasta_index = ref_fasta_index,
-                input_bam = bamFile,
-                input_bam_index = bamIndex,
-                recalibration_report_filename = sub(basename(bamFile), ".bam$", ".bqsr")
+                sequenceGroupInterval = [bed],
+                refFasta = refFasta,
+                refDict = refDict,
+                refFastaIndex = refFastaIndex,
+                inputBam = bamFile,
+                inputBamIndex = bamIndex,
+                recalibrationReportPath = scatterDir + "/" + basename(bed) + ".bqsr"
         }
     }
 
     call gatk.GatherBqsrReports as gatherBqsr {
         input:
-            input_bqsr_reports = baseRecalibrator.recalibration_report,
-            output_report_filepath = sub(bamFile, ".bam$", ".bqsr")
+            inputBQSRreports = baseRecalibrator.recalibrationReport,
+            outputReportPath = outputDir + "/" + sub(basename(bamFile), ".bam$", ".bqsr")
     }
 
     Boolean splitSplicedReads2 = select_first([splitSplicedReads, false])
@@ -44,26 +46,30 @@ workflow GatkPreprocess {
             call gatk.SplitNCigarReads as splitNCigarReads {
                 input:
                     intervals = [bed],
-                    ref_fasta = ref_fasta,
-                    ref_dict = ref_dict,
-                    ref_fasta_index = ref_fasta_index,
-                    input_bam = bamFile,
-                    output_bam = sub(basename(bamFile), ".bam$", "." + basename(bed) + ".bam")
-                }
+                    refFasta = refFasta,
+                    refDict = refDict,
+                    refFastaIndex = refFastaIndex,
+                    inputBam = bamFile,
+                    inputBamIndex= bamIndex,
+                    outputBam = scatterDir + "/" + basename(bed) + ".split.bam"
             }
+        }
 
         call gatk.ApplyBQSR as applyBqsr {
             input:
-                sequence_group_interval = [bed],
-                ref_fasta = ref_fasta,
-                ref_dict = ref_dict,
-                ref_fasta_index = ref_fasta_index,
-                input_bam = if splitSplicedReads2 then select_first([splitNCigarReads.bam]) else bamFile,
-                recalibration_report = gatherBqsr.output_bqsr_report,
-                output_bam_path = sub(basename(bamFile), ".bam$", ".bqsr.bam")
+                sequenceGroupInterval = [bed],
+                refFasta = refFasta,
+                refDict = refDict,
+                refFastaIndex = refFastaIndex,
+                inputBam = if splitSplicedReads2
+                    then select_first([splitNCigarReads.bam])
+                    else bamFile,
+                inputBamIndex = if splitSplicedReads2
+                    then select_first([splitNCigarReads.bamIndex])
+                    else bamIndex,
+                recalibrationReport = gatherBqsr.outputBQSRreport,
+                outputBamPath = scatterDir + "/" + basename(bed) + ".bqsr.bam"
         }
-
-
     }
 
     call picard.GatherBamFiles as gatherBamFiles {
