@@ -10,6 +10,8 @@ workflow GatkPreprocess {
     File refDict
     File refFastaIndex
     Boolean? splitSplicedReads
+    File dbsnpVCF
+    File dbsnpVCFindex
 
     String outputDir = sub(outputBamPath, basename(outputBamPath), "")
     String scatterDir = outputDir +  "/scatter/"
