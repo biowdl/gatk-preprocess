@@ -32,7 +32,9 @@ workflow GatkPreprocess {
                 refFastaIndex = refFastaIndex,
                 inputBam = bamFile,
                 inputBamIndex = bamIndex,
-                recalibrationReportPath = scatterDir + "/" + basename(bed) + ".bqsr"
+                recalibrationReportPath = scatterDir + "/" + basename(bed) + ".bqsr",
+                dbsnpVCF = dbsnpVCF,
+                dbsnpVCFindex = dbsnpVCFindex
         }
     }
 
