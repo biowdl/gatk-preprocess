@@ -30,20 +30,31 @@ import nl.biopet.utils.ngs.vcf.getVcfIndexFile
 trait GatkPreprocess extends Pipeline with Reference {
 
   def outputFile: File
-  def bamFile: Option[File]
-  def dbsnpFile: Option[File]
+  def bamFile: File
+  def dbsnpFile: File
+
+  def bamIndexFile: File = {
+    val index1 = new File(bamFile.getAbsolutePath + ".bai")
+    val index2 = new File(bamFile.getAbsolutePath.stripSuffix(".bam") + ".bai")
+    (index1.exists(), index2.exists()) match {
+      case (true, _) => index1
+      case (_, true) => index2
+      case _ => throw new IllegalStateException("No index found")
+    }
+  }
 
   override def inputs: Map[String, Any] =
     super.inputs ++
       Map(
-        "GatkPreprocess.outputDir" -> outputDir.getAbsolutePath,
+        "GatkPreprocess.outputBamPath" -> outputFile.getAbsolutePath,
         "GatkPreprocess.refFasta" -> referenceFasta.getAbsolutePath,
         "GatkPreprocess.refFastaIndex" -> referenceFastaIndexFile.getAbsolutePath,
-        "GatkPreprocess.refDict" -> referenceFastaDictFile.getAbsolutePath
-      ) ++ 
-      bamFile.map("GatkPreprocess.bamFiles" -> _.getAbsolutePath)
-      dbsnpFile.map("GatkPreprocess.dbsnpVCF" -> _.getAbsolutePath) ++
-      dbsnpFile.map("GatkPreprocess.dbsnpVCFindex" -> getVcfIndexFile(_).getAbsolutePath)
+        "GatkPreprocess.refDict" -> referenceFastaDictFile.getAbsolutePath,
+        "GatkPreprocess.bamFile" -> bamFile.getAbsolutePath,
+        "GatkPreprocess.bamIndex" -> bamIndexFile.getAbsolutePath,
+        "GatkPreprocess.dbsnpVCF" -> dbsnpFile.getAbsolutePath,
+        "GatkPreprocess.dbsnpVCFindex" -> getVcfIndexFile(dbsnpFile).getAbsolutePath
+      )
 
   def startFile: File = new File("./gatk-preprocess.wdl")
 }
