@@ -1,0 +1,9 @@
+name: multsample
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+dependencies:
+  - gatk4==4.0.4.0
+  - picard==2.18.7
