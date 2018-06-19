@@ -24,5 +24,6 @@ package biowdl.test
 import nl.biopet.utils.biowdl.PipelineSuccess
 
 trait GatkPreprocessSuccess extends GatkPreprocess with PipelineSuccess {
-
+  addMustHaveFile(s"$outputFile")
+  addMustHaveFile(s"$outputFile".stripSuffix(".bam") + ".bai")
 }

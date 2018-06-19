@@ -27,9 +27,9 @@ import nl.biopet.utils.biowdl.references.TestReference
 import nl.biopet.utils.biowdl.fixtureFile
 
 trait GatkPreprocessSingleEnd extends GatkPreprocessSuccess with TestReference {
-  def outputFile: File = new File(outputDir, "test.g.vcf.gz")
-  def bamFile: Option[File] = Some(fixtureFile("samples", "wgs1", "wgs1.bam"))
-  def dbsnpFile: Option[File] = Some(fixtureFile("samples", "wgs2", "wgs2.vcf.gz"))
+  def outputFile: File = new File(outputDir, "test.bam")
+  def bamFile: File = fixtureFile("samples", "wgs1", "wgs1.bam")
+  def dbsnpFile: File = fixtureFile("samples", "wgs2", "wgs2.vcf.gz")
 }
 
 class GatkPreprocessTest
