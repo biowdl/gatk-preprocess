@@ -32,6 +32,13 @@ trait GatkPreprocessSingleEnd extends GatkPreprocessSuccess with TestReference {
   def dbsnpFile: File = fixtureFile("samples", "wgs2", "wgs2.vcf.gz")
 }
 
+trait GatkPreprocessSplitNCigarReads extends GatkPreprocessSingleEnd {
+  override def splitSplicedReads: Boolean = true
+}
+
 class GatkPreprocessTest
     extends GatkPreprocessSingleEnd
     with GatkPreprocessSuccess {}
+
+class GatkPreprocessSplitNCigarReadsTest
+    extends GatkPreprocessSplitNCigarReads with GatkPreprocessSuccess {}

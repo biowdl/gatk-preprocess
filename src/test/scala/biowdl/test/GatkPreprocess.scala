@@ -32,6 +32,7 @@ trait GatkPreprocess extends Pipeline with Reference {
   def outputFile: File
   def bamFile: File
   def dbsnpFile: File
+  def splitSplicedReads: Boolean = false
 
   def bamIndexFile: File = {
     val index1 = new File(bamFile.getAbsolutePath + ".bai")
@@ -53,7 +54,8 @@ trait GatkPreprocess extends Pipeline with Reference {
         "GatkPreprocess.bamFile" -> bamFile.getAbsolutePath,
         "GatkPreprocess.bamIndex" -> bamIndexFile.getAbsolutePath,
         "GatkPreprocess.dbsnpVCF" -> dbsnpFile.getAbsolutePath,
-        "GatkPreprocess.dbsnpVCFindex" -> getVcfIndexFile(dbsnpFile).getAbsolutePath
+        "GatkPreprocess.dbsnpVCFindex" -> getVcfIndexFile(dbsnpFile).getAbsolutePath,
+        "GatkPreprocess.splitSplicedReads" -> splitSplicedReads
       )
 
   def startFile: File = new File("./gatk-preprocess.wdl")
