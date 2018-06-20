@@ -41,4 +41,5 @@ class GatkPreprocessTest
     with GatkPreprocessSuccess {}
 
 class GatkPreprocessSplitNCigarReadsTest
-    extends GatkPreprocessSplitNCigarReads with GatkPreprocessSuccess {}
+    extends GatkPreprocessSplitNCigarReads
+    with GatkPreprocessSuccess {}
