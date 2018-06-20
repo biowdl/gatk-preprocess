@@ -34,6 +34,4 @@ trait GatkPreprocessSingleEnd extends GatkPreprocessSuccess with TestReference {
 
 class GatkPreprocessTest
     extends GatkPreprocessSingleEnd
-    with GatkPreprocessSuccess {
-
-}
+    with GatkPreprocessSuccess {}

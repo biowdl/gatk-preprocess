@@ -39,7 +39,7 @@ trait GatkPreprocess extends Pipeline with Reference {
     (index1.exists(), index2.exists()) match {
       case (true, _) => index1
       case (_, true) => index2
-      case _ => throw new IllegalStateException("No index found")
+      case _         => throw new IllegalStateException("No index found")
     }
   }
 
