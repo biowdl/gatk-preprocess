@@ -10,6 +10,8 @@ workflow GatkPreprocess {
     File refDict
     File refFastaIndex
     Boolean? splitSplicedReads
+    File dbsnpVCF
+    File dbsnpVCFindex
 
     String outputDir = sub(outputBamPath, basename(outputBamPath), "")
     String scatterDir = outputDir +  "/scatter/"
@@ -30,7 +32,9 @@ workflow GatkPreprocess {
                 refFastaIndex = refFastaIndex,
                 inputBam = bamFile,
                 inputBamIndex = bamIndex,
-                recalibrationReportPath = scatterDir + "/" + basename(bed) + ".bqsr"
+                recalibrationReportPath = scatterDir + "/" + basename(bed) + ".bqsr",
+                dbsnpVCF = dbsnpVCF,
+                dbsnpVCFindex = dbsnpVCFindex
         }
     }
 
