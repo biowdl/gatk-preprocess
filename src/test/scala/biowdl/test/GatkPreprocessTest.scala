@@ -38,8 +38,8 @@ trait GatkPreprocessSplitNCigarReads extends GatkPreprocessSingleEnd {
 
 class GatkPreprocessTest
     extends GatkPreprocessSingleEnd
-    with GatkPreprocessSuccess {}
+    with GatkPreprocessSuccess
 
 class GatkPreprocessSplitNCigarReadsTest
     extends GatkPreprocessSplitNCigarReads
-    with GatkPreprocessSuccess {}
+    with GatkPreprocessSuccess
