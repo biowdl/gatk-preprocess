@@ -11,10 +11,10 @@ on the
 This workflow can be used for either germline DNA data or RNA-seq data.
 
 ## Usage
-`gatk-prepreprocess.wdl` can be run using
+`gatk-preprocess.wdl` can be run using
 [Cromwell](http://cromwell.readthedocs.io/en/stable/):
 ```
-java -jar cromwell-<version>.jar run -i inputs.json gatk-prepreprocess.wdl
+java -jar cromwell-<version>.jar run -i inputs.json gatk-preprocess.wdl
 ```
 
 The inputs json can be generated using WOMtools as described in the [WOMtools
@@ -52,8 +52,8 @@ developed by [the SASC team](http://sasc.lumc.nl/).
 ## Contact
 <p>
   <!-- Obscure e-mail address for spammers -->
-For any question related to gatk-prepreprocess, please use the
-<a href='https://github.com/biowdl/expression-quantification/issues'>github issue tracker</a>
+For any question related to gatk-preprocess, please use the
+<a href='https://github.com/biowdl/gatk-preprocess/issues'>github issue tracker</a>
 or contact
  <a href='http://sasc.lumc.nl/'>the SASC team</a> directly at: <a href='&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#97;&#115;&#99;&#64;&#108;&#117;&#109;&#99;&#46;&#110;&#108;'>
 &#115;&#97;&#115;&#99;&#64;&#108;&#117;&#109;&#99;&#46;&#110;&#108;</a>.
