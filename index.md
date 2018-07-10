@@ -2,9 +2,6 @@
 layout: default
 ---
 
-> BioWDL is currently still under development and not production ready.
-> Use at own risk!
-
 This workflow performs preprocessing steps required for variantcalling based
 on the
 [GATK Best Practices](https://software.broadinstitute.org/gatk/best-practices/).
