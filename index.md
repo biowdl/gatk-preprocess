@@ -14,7 +14,7 @@ This workflow can be used for either germline DNA data or RNA-seq data.
 java -jar cromwell-<version>.jar run -i inputs.json gatk-preprocess.wdl
 ```
 
-The inputs json can be generated using WOMtools as described in the [WOMtools
+The inputs JSON can be generated using WOMtools as described in the [WOMtools
 documentation](http://cromwell.readthedocs.io/en/stable/WOMtool/).
 
 The primary inputs are described below, additional inputs (such as precommands
@@ -25,17 +25,17 @@ to see all available inputs.
 |-|-|-|
 | bamFile | `File` | The BAM file for which preprocessing will be performed. |
 | bamIndex | `File` | The index associated with the input BAM file. |
-| outputBamPath | `String` | The path for the ouput (preprocessed) BAM file. |
+| outputBamPath | `String` | The path for the output (preprocessed) BAM file. |
 | refFasta | `File` | The fasta file for the reference genome used during mapping. |
 | refDict | `File` | The dict file associated with the reference fasta. |
 | refFastaIndex | `File` | The index associated with the reference fasta. |
 | dbsnpVCF | `File` | The dbSNP VCF file to be used for preprocessing. |
-| dbsnpVCFindex | `File` | The index associated with the input dbSNP vcf. |
+| dbsnpVCFindex | `File` | The index associated with the input dbSNP VCF. |
 | splitSplicedReads | `Boolean?` | Whether or not SplitNCigarReads should be run. This should be true for RNA-seq samples and false for DNA sample. |
 
 >All inputs have to be preceded by with `GatkPreprocess.`.
 Type is indicated according to the WDL data types: `File` should be indicators
-of file location (a string in json). Types ending in `?` indicate the input is
+of file location (a string in JSON). Types ending in `?` indicate the input is
 optional, types ending in `+` indicate they require at least one element.
 
 ## Output
@@ -43,7 +43,7 @@ This workflow will produce a new BAM file on which preprocessing has been
 performed.
 
 ## About
-This workflow is part of [Biowdl](https://biowdl.github.io/)
+This workflow is part of [BioWDL](https://biowdl.github.io/)
 developed by [the SASC team](http://sasc.lumc.nl/).
 
 ## Contact

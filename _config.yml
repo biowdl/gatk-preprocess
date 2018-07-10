@@ -1,3 +1,2 @@
 remote_theme: biowdl/minimal
 title: "BioWDL: gatk-preprocess"
-description: "A BioWDL workflow for preprocessing BAM files for variantcalling. Based on the GATK Best Practices."
