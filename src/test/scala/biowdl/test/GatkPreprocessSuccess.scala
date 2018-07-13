@@ -37,12 +37,12 @@ trait GatkPreprocessSuccess extends GatkPreprocess with PipelineSuccess {
     val programs: List[String] =
       bamReader.getFileHeader.getProgramRecords.asScala.map(_.getProgramName).toList
 
-    programs should contain "GATK ApplyBQSR"
+    programs should contain("GATK ApplyBQSR")
 
     if (splitSplicedReads) {
       programs should contain("GATK SplitNCigarReads")
     } else {
-      programs should not contain "GATK SplitNCigarReads"
+      programs should not contain("GATK SplitNCigarReads")
     }
   }
 }
