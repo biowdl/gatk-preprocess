@@ -21,9 +21,30 @@
 
 package biowdl.test
 
+import scala.collection.JavaConverters._
+
+import htsjdk.samtools.{SamReader, SamReaderFactory}
 import nl.biopet.utils.biowdl.PipelineSuccess
+import org.testng.annotations.Test
 
 trait GatkPreprocessSuccess extends GatkPreprocess with PipelineSuccess {
   addMustHaveFile(outputFile)
   addMustHaveFile(s"${outputFile.getName}".stripSuffix(".bam") + ".bai")
+
+  @Test
+  def testPrograms(): Unit = {
+    val bamReader: SamReader = SamReaderFactory.makeDefault().open(outputFile)
+    val programs: List[String] =
+      bamReader.getFileHeader.getProgramRecords.asScala
+        .map(_.getProgramName)
+        .toList
+
+    programs should contain("GATK ApplyBQSR")
+
+    if (splitSplicedReads) {
+      programs should contain("GATK SplitNCigarReads")
+    } else {
+      programs should not contain ("GATK SplitNCigarReads")
+    }
+  }
 }
