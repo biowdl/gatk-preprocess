@@ -1,5 +1,8 @@
 ---
 layout: default
+title: Home
+version: develop
+latest: true
 ---
 
 This workflow performs preprocessing steps required for variantcalling based
