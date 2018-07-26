@@ -1,17 +1,21 @@
+version 1.0
+
 import "tasks/biopet.wdl" as biopet
 import "tasks/gatk.wdl" as gatk
 import "tasks/picard.wdl" as picard
 
 workflow GatkPreprocess {
-    File bamFile
-    File bamIndex
-    String outputBamPath
-    File refFasta
-    File refDict
-    File refFastaIndex
-    Boolean? splitSplicedReads
-    File dbsnpVCF
-    File dbsnpVCFindex
+    input{
+        File bamFile
+        File bamIndex
+        String outputBamPath
+        File refFasta
+        File refDict
+        File refFastaIndex
+        Boolean splitSplicedReads = false
+        File dbsnpVCF
+        File dbsnpVCFindex
+    }
 
     String outputDir = sub(outputBamPath, basename(outputBamPath), "")
     String scatterDir = outputDir +  "/scatter/"
@@ -44,9 +48,8 @@ workflow GatkPreprocess {
             outputReportPath = outputDir + "/" + sub(basename(bamFile), ".bam$", ".bqsr")
     }
 
-    Boolean splitSplicedReads2 = select_first([splitSplicedReads, false])
     scatter (bed in scatterList.scatters) {
-        if (splitSplicedReads2) {
+        if (splitSplicedReads) {
             call gatk.SplitNCigarReads as splitNCigarReads {
                 input:
                     intervals = [bed],
@@ -65,14 +68,16 @@ workflow GatkPreprocess {
                 refFasta = refFasta,
                 refDict = refDict,
                 refFastaIndex = refFastaIndex,
-                inputBam = if splitSplicedReads2
+                inputBam = if splitSplicedReads
                     then select_first([splitNCigarReads.bam])
                     else bamFile,
-                inputBamIndex = if splitSplicedReads2
+                inputBamIndex = if splitSplicedReads
                     then select_first([splitNCigarReads.bamIndex])
                     else bamIndex,
                 recalibrationReport = gatherBqsr.outputBQSRreport,
-                outputBamPath = scatterDir + "/" + basename(bed) + ".bqsr.bam"
+                outputBamPath = if splitSplicedReads
+                    then scatterDir + "/" + basename(bed) + ".split.bqsr.bam"
+                    else scatterDir + "/" + basename(bed) + ".bqsr.bam"
         }
     }
 
