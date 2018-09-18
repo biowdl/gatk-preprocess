@@ -48,13 +48,17 @@ trait GatkPreprocess extends Pipeline with Reference {
     super.inputs ++
       Map(
         "GatkPreprocess.outputBamPath" -> outputFile.getAbsolutePath,
-        "GatkPreprocess.refFasta" -> referenceFasta.getAbsolutePath,
-        "GatkPreprocess.refFastaIndex" -> referenceFastaIndexFile.getAbsolutePath,
-        "GatkPreprocess.refDict" -> referenceFastaDictFile.getAbsolutePath,
-        "GatkPreprocess.bamFile" -> bamFile.getAbsolutePath,
-        "GatkPreprocess.bamIndex" -> bamIndexFile.getAbsolutePath,
-        "GatkPreprocess.dbsnpVCF" -> dbsnpFile.getAbsolutePath,
-        "GatkPreprocess.dbsnpVCFindex" -> getVcfIndexFile(dbsnpFile).getAbsolutePath,
+        "GatkPreprocess.reference" -> Map(
+          "fasta" -> referenceFasta.getAbsolutePath,
+          "fai" -> referenceFastaIndexFile.getAbsolutePath,
+          "dict" -> referenceFastaDictFile.getAbsolutePath
+        ),
+        "GatkPreprocess.bamFile" -> Map(
+          "file" -> bamFile.getAbsolutePath,
+          "index" -> bamIndexFile.getAbsolutePath),
+        "GatkPreprocess.dbsnpVCF" -> Map(
+          "file" -> dbsnpFile.getAbsolutePath,
+          "index" -> getVcfIndexFile(dbsnpFile).getAbsolutePath),
         "GatkPreprocess.splitSplicedReads" -> splitSplicedReads
       )
 
