@@ -20,7 +20,8 @@ workflow GatkPreprocess {
     call biopet.ScatterRegions as scatterList {
         input:
             reference = reference,
-            outputDirPath = scatterDir
+            outputDirPath = scatterDir,
+            scatterSize = 10000000
     }
 
     scatter (bed in scatterList.scatters) {
