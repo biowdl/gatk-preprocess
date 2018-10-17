@@ -59,7 +59,8 @@ trait GatkPreprocess extends Pipeline with Reference {
         "GatkPreprocess.dbsnpVCF" -> Map(
           "file" -> dbsnpFile.getAbsolutePath,
           "index" -> getVcfIndexFile(dbsnpFile).getAbsolutePath),
-        "GatkPreprocess.splitSplicedReads" -> splitSplicedReads
+        "GatkPreprocess.splitSplicedReads" -> splitSplicedReads,
+        "GatkPreprocess.scatterSize" -> 1000 //This is to be able to test whether scatter order is correct for the gatherBamFiles step
       )
 
   def startFile: File = new File("./gatk-preprocess.wdl")
