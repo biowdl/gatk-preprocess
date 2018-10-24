@@ -8,15 +8,16 @@ import "tasks/common.wdl" as common
 workflow GatkPreprocess {
     input{
         IndexedBamFile bamFile
-        String outputBamPath
+        String basePath
         Reference reference
         Boolean splitSplicedReads = false
+        Boolean outputRecalibratedBam = false
         IndexedVcfFile dbsnpVCF
         Int scatterSize = 10000000
     }
 
-    String outputDir = sub(outputBamPath, basename(outputBamPath), "")
-    String scatterDir = outputDir +  "/scatter/"
+    String outputDir = sub(basePath, basename(basePath) + "$", "")
+    String scatterDir = outputDir +  "/gatk_preprocess_scatter/"
 
     call biopet.ScatterRegions as scatterList {
         input:
@@ -41,12 +42,14 @@ workflow GatkPreprocess {
                 recalibrationReportPath = scatterDir + "/" + basename(bed) + ".bqsr",
                 dbsnpVCF = dbsnpVCF
         }
+
+
     }
 
     call gatk.GatherBqsrReports as gatherBqsr {
         input:
             inputBQSRreports = baseRecalibrator.recalibrationReport,
-            outputReportPath = outputDir + "/" + sub(basename(bamFile.file), ".bam$", ".bqsr")
+            outputReportPath = basePath + ".bqsr"
     }
 
     scatter (bed in orderedScatters.reorderedScatters) {
@@ -58,33 +61,47 @@ workflow GatkPreprocess {
                     inputBam = bamFile,
                     outputBam = scatterDir + "/" + basename(bed) + ".split.bam"
             }
+
+            File splicedBamFiles = splitNCigarReads.bam.file
+            File splicedBamIndexes = splitNCigarReads.bam.index
         }
 
-        call gatk.ApplyBQSR as applyBqsr {
-            input:
-                sequenceGroupInterval = [bed],
-                reference = reference,
-                inputBam = if splitSplicedReads
-                    then select_first([splitNCigarReads.bam])
-                    else bamFile,
-                recalibrationReport = gatherBqsr.outputBQSRreport,
-                outputBamPath = if splitSplicedReads
-                    then scatterDir + "/" + basename(bed) + ".split.bqsr.bam"
-                    else scatterDir + "/" + basename(bed) + ".bqsr.bam"
-        }
+        if (outputRecalibratedBam) {
+            call gatk.ApplyBQSR as applyBqsr {
+                input:
+                    sequenceGroupInterval = [bed],
+                    reference = reference,
+                    inputBam = if splitSplicedReads
+                        then select_first([splitNCigarReads.bam])
+                        else bamFile,
+                    recalibrationReport = gatherBqsr.outputBQSRreport,
+                    outputBamPath = if splitSplicedReads
+                        then scatterDir + "/" + basename(bed) + ".split.bqsr.bam"
+                        else scatterDir + "/" + basename(bed) + ".bqsr.bam"
+            }
 
-        File chunkBamFiles = applyBqsr.recalibratedBam.file
-        File chunkBamIndxes = applyBqsr.recalibratedBam.index
+            File chunkBamFiles = applyBqsr.recalibratedBam.file
+            File chunkBamIndexes = applyBqsr.recalibratedBam.index
+        }
     }
 
-    call picard.GatherBamFiles as gatherBamFiles {
-        input:
-            inputBams = chunkBamFiles,
-            inputBamsIndex = chunkBamIndxes,
-            outputBamPath = outputBamPath
+    # If splitSplicedReads a is true a new bam file should be made even if
+    # ouputRecalibratedBam is false.
+    if (outputRecalibratedBam || splitSplicedReads) {
+        call picard.GatherBamFiles as gatherBamFiles {
+            input:
+                inputBams = if outputRecalibratedBam
+                    then select_all(chunkBamFiles)
+                    else select_all(splicedBamFiles),
+                inputBamsIndex = if outputRecalibratedBam
+                    then select_all(chunkBamIndexes)
+                    else select_all(splicedBamIndexes),
+                outputBamPath = basePath + ".bam"
+        }
     }
 
     output {
-        IndexedBamFile outputBamFile = gatherBamFiles.outputBam
+        IndexedBamFile? outputBamFile = gatherBamFiles.outputBam
+        File BQSRreport = gatherBqsr.outputBQSRreport
     }
 }
