@@ -23,7 +23,8 @@ workflow GatkPreprocess {
         input:
             reference = reference,
             outputDirPath = scatterDir,
-            scatterSize = scatterSize
+            scatterSize = scatterSize,
+            notSplitContigs = true
     }
 
     # Glob messes with order of scatters (10 comes before 1), which causes problem at gatherBamFiles
@@ -42,8 +43,6 @@ workflow GatkPreprocess {
                 recalibrationReportPath = scatterDir + "/" + basename(bed) + ".bqsr",
                 dbsnpVCF = dbsnpVCF
         }
-
-
     }
 
     call gatk.GatherBqsrReports as gatherBqsr {
