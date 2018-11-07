@@ -21,30 +21,43 @@
 
 package biowdl.test
 
-import scala.collection.JavaConverters._
+import java.io.File
 
+import scala.collection.JavaConverters._
 import htsjdk.samtools.{SamReader, SamReaderFactory}
 import nl.biopet.utils.biowdl.PipelineSuccess
 import org.testng.annotations.Test
 
 trait GatkPreprocessSuccess extends GatkPreprocess with PipelineSuccess {
-  addMustHaveFile(outputFile)
-  addMustHaveFile(s"${outputFile.getName}".stripSuffix(".bam") + ".bai")
+  if (outputRecalibratedBam || splitSplicedReads) {
+    addMustHaveFile(new File(s"$basePath.bam"))
+    addMustHaveFile(new File(s"$basePath.bai"))
+  }
 
-  @Test
+  addMustHaveFile(new File(s"$basePath.bqsr"))
+
+  @Test()
   def testPrograms(): Unit = {
-    val bamReader: SamReader = SamReaderFactory.makeDefault().open(outputFile)
-    val programs: List[String] =
-      bamReader.getFileHeader.getProgramRecords.asScala
-        .map(_.getProgramName)
-        .toList
+    if (outputRecalibratedBam || splitSplicedReads) {
+      val outputBam = new File(s"$basePath.bam")
 
-    programs should contain("GATK ApplyBQSR")
+      val bamReader: SamReader = SamReaderFactory.makeDefault().open(outputBam)
+      val programs: List[String] =
+        bamReader.getFileHeader.getProgramRecords.asScala
+          .map(_.getProgramName)
+          .toList
 
-    if (splitSplicedReads) {
-      programs should contain("GATK SplitNCigarReads")
-    } else {
-      programs should not contain ("GATK SplitNCigarReads")
+      if (outputRecalibratedBam) {
+        programs should contain("GATK ApplyBQSR")
+      } else {
+        programs should not contain ("GATK ApplyBQSR")
+      }
+
+      if (splitSplicedReads) {
+        programs should contain("GATK SplitNCigarReads")
+      } else {
+        programs should not contain ("GATK SplitNCigarReads")
+      }
     }
   }
 }

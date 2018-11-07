@@ -29,10 +29,11 @@ import nl.biopet.utils.ngs.vcf.getVcfIndexFile
 
 trait GatkPreprocess extends Pipeline with Reference {
 
-  def outputFile: File
+  def basePath: String
   def bamFile: File
   def dbsnpFile: File
   def splitSplicedReads: Boolean = false
+  def outputRecalibratedBam: Boolean = false
 
   def bamIndexFile: File = {
     val index1 = new File(bamFile.getAbsolutePath + ".bai")
@@ -47,7 +48,7 @@ trait GatkPreprocess extends Pipeline with Reference {
   override def inputs: Map[String, Any] =
     super.inputs ++
       Map(
-        "GatkPreprocess.outputBamPath" -> outputFile.getAbsolutePath,
+        "GatkPreprocess.basePath" -> basePath,
         "GatkPreprocess.reference" -> Map(
           "fasta" -> referenceFasta.getAbsolutePath,
           "fai" -> referenceFastaIndexFile.getAbsolutePath,
@@ -59,7 +60,9 @@ trait GatkPreprocess extends Pipeline with Reference {
         "GatkPreprocess.dbsnpVCF" -> Map(
           "file" -> dbsnpFile.getAbsolutePath,
           "index" -> getVcfIndexFile(dbsnpFile).getAbsolutePath),
-        "GatkPreprocess.splitSplicedReads" -> splitSplicedReads
+        "GatkPreprocess.splitSplicedReads" -> splitSplicedReads,
+        "GatkPreprocess.outputRecalibratedBam" -> outputRecalibratedBam,
+        "GatkPreprocess.scatterSize" -> 5000 //make sure scattering happens
       )
 
   def startFile: File = new File("./gatk-preprocess.wdl")

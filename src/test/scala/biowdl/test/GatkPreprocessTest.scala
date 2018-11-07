@@ -26,20 +26,33 @@ import java.io.File
 import nl.biopet.utils.biowdl.references.TestReference
 import nl.biopet.utils.biowdl.fixtureFile
 
-trait GatkPreprocessSingleEnd extends GatkPreprocessSuccess with TestReference {
-  def outputFile: File = new File(outputDir, "test.bam")
+trait GatkPreprocessTestBase extends GatkPreprocessSuccess with TestReference {
+  def basePath: String = s"${outputDir.getAbsolutePath}/test"
   def bamFile: File = fixtureFile("samples", "wgs1", "wgs1.bam")
   def dbsnpFile: File = fixtureFile("samples", "wgs2", "wgs2.vcf.gz")
 }
 
-trait GatkPreprocessSplitNCigarReads extends GatkPreprocessSingleEnd {
+trait GatkPreprocessSplitNCigarReads extends GatkPreprocessTestBase {
   override def splitSplicedReads: Boolean = true
 }
 
+trait GatkPreprocessRecalibratedBam extends GatkPreprocessTestBase {
+  override def outputRecalibratedBam: Boolean = true
+}
+
 class GatkPreprocessTest
-    extends GatkPreprocessSingleEnd
+    extends GatkPreprocessTestBase
+    with GatkPreprocessSuccess
+
+class GatkPreprocessRecalibratedBamTest
+    extends GatkPreprocessRecalibratedBam
     with GatkPreprocessSuccess
 
 class GatkPreprocessSplitNCigarReadsTest
     extends GatkPreprocessSplitNCigarReads
+    with GatkPreprocessSuccess
+
+class GatkPreprocessSplitNCigarReadsRecalibratedBamTest
+    extends GatkPreprocessSplitNCigarReads
+    with GatkPreprocessRecalibratedBam
     with GatkPreprocessSuccess
