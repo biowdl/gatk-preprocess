@@ -38,26 +38,26 @@ trait GatkPreprocessSuccess extends GatkPreprocess with PipelineSuccess {
 
   @Test()
   def testPrograms(): Unit = {
-    if (!outputRecalibratedBam && !splitSplicedReads) return
+    if (outputRecalibratedBam || splitSplicedReads) {
+      val outputBam = new File(s"$basePath.bam")
 
-    val outputBam = new File(s"$basePath.bam")
+      val bamReader: SamReader = SamReaderFactory.makeDefault().open(outputBam)
+      val programs: List[String] =
+        bamReader.getFileHeader.getProgramRecords.asScala
+          .map(_.getProgramName)
+          .toList
 
-    val bamReader: SamReader = SamReaderFactory.makeDefault().open(outputBam)
-    val programs: List[String] =
-      bamReader.getFileHeader.getProgramRecords.asScala
-        .map(_.getProgramName)
-        .toList
+      if (outputRecalibratedBam) {
+        programs should contain("GATK ApplyBQSR")
+      } else {
+        programs should not contain ("GATK ApplyBQSR")
+      }
 
-    if (outputRecalibratedBam) {
-      programs should contain("GATK ApplyBQSR")
-    } else {
-      programs should not contain ("GATK ApplyBQSR")
-    }
-
-    if (splitSplicedReads) {
-      programs should contain("GATK SplitNCigarReads")
-    } else {
-      programs should not contain ("GATK SplitNCigarReads")
+      if (splitSplicedReads) {
+        programs should contain("GATK SplitNCigarReads")
+      } else {
+        programs should not contain ("GATK SplitNCigarReads")
+      }
     }
   }
 }
