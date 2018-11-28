@@ -2,7 +2,7 @@
 layout: default
 title: Home
 version: develop
-latest: true
+latest: false
 ---
 
 This workflow performs preprocessing steps required for variantcalling based
