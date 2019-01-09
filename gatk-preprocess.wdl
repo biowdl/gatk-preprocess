@@ -14,6 +14,8 @@ workflow GatkPreprocess {
         Boolean outputRecalibratedBam = false
         IndexedVcfFile dbsnpVCF
         Int scatterSize = 10000000
+
+        File? regions
     }
 
     String outputDir = sub(basePath, basename(basePath) + "$", "")
@@ -24,7 +26,8 @@ workflow GatkPreprocess {
             reference = reference,
             outputDirPath = scatterDir,
             scatterSize = scatterSize,
-            notSplitContigs = true
+            notSplitContigs = true,
+            regions = regions
     }
 
     # Glob messes with order of scatters (10 comes before 1), which causes problem at gatherBamFiles
