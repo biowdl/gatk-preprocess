@@ -4,7 +4,7 @@
   command: >-
     bash -c '
     TEST_JSON=tests/integration/base.json ;
-    sed -i "2i\"pipeline.outputDir\":\"$PWD/test-output\"," $TEST_JSON ;
+    sed -i "2i\"GatkPreprocess.basePath\":\"$PWD/test-output/test\"," $TEST_JSON ;
     cromwell run -i $TEST_JSON pipeline.wdl'
 
 - name: recalibrated_bam
@@ -13,7 +13,7 @@
   command: >-
     bash -c '
     TEST_JSON=tests/integration/recalibrated_bam.json ;
-    sed -i "2i\"pipeline.outputDir\":\"$PWD/test-output\"," $TEST_JSON ;
+    sed -i "2i\"GatkPreprocess.basePath\":\"$PWD/test-output/test\"," $TEST_JSON ;
     cromwell run -i $TEST_JSON pipeline.wdl'
 
 
@@ -23,7 +23,7 @@
   command: >-
     bash -c '
     TEST_JSON=tests/integration/split_n_cigar.json ;
-    sed -i "2i\"pipeline.outputDir\":\"$PWD/test-output\"," $TEST_JSON ;
+    sed -i "2i\"GatkPreprocess.basePath\":\"$PWD/test-output/test\"," $TEST_JSON ;
     cromwell run -i $TEST_JSON pipeline.wdl'
 
 - name: split_n_cigar_recalibrated_bam
@@ -32,5 +32,5 @@
   command: >-
     bash -c '
     TEST_JSON=tests/integration/split_n_cigar_recalibrated_bam.json ;
-    sed -i "2i\"pipeline.outputDir\":\"$PWD/test-output\"," $TEST_JSON ;
+    sed -i "2i\"GatkPreprocess.basePath\":\"$PWD/test-output/test\"," $TEST_JSON ;
     cromwell run -i $TEST_JSON pipeline.wdl'

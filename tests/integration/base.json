@@ -1,5 +1,4 @@
 {
-  "GatkPreprocess.basePath": "test-output/test",
   "GatkPreprocess.reference": {
     "fasta": "tests/data/reference.fasta",
     "fai": "tests/data/reference.fasta.fai",
