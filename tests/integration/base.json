@@ -8,7 +8,7 @@
     "file": "tests/data/wgs1.bam",
     "index": "tests/data/wgs1.bai"
   },
-  "GakPreprocess.dbsnpVCF": {
+  "GatkPreprocess.dbsnpVCF": {
     "file": "tests/data/wgs2.vcf.gz",
     "index": "tests/data/wgs2.vcf.gz.tbi"
   },
