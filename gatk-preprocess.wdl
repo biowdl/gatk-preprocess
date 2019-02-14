@@ -13,7 +13,7 @@ workflow GatkPreprocess {
         Boolean splitSplicedReads = false
         Boolean outputRecalibratedBam = false
         IndexedVcfFile dbsnpVCF
-        Int scatterSize = 10000000
+        Int scatterSize = 400000000  # Scatter size is based on bases. 400 million bases is approx 2.66 million reads.
 
         File? regions
     }
