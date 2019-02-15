@@ -22,7 +22,10 @@
     TEST_JSON=tests/integration/recalibrated_bam.json ;
     sed -i "2i\"GatkPreprocess.basePath\":\"$PWD/test-output/test\"," $TEST_JSON ;
     cromwell run -i $TEST_JSON gatk-preprocess.wdl'
-
+  files:
+    - path: "test-output/test.bam"
+    - path: "test-output/test.bai"
+    - path: "test-output/test.bqsr"
 
 - name: split_n_cigar
   tags:
@@ -32,6 +35,10 @@
     TEST_JSON=tests/integration/split_n_cigar.json ;
     sed -i "2i\"GatkPreprocess.basePath\":\"$PWD/test-output/test\"," $TEST_JSON ;
     cromwell run -i $TEST_JSON gatk-preprocess.wdl'
+  files:
+    - path: "test-output/test.bam"
+    - path: "test-output/test.bai"
+    - path: "test-output/test.bqsr"
 
 - name: split_n_cigar_recalibrated_bam
   tags:
@@ -41,3 +48,7 @@
     TEST_JSON=tests/integration/split_n_cigar_recalibrated_bam.json ;
     sed -i "2i\"GatkPreprocess.basePath\":\"$PWD/test-output/test\"," $TEST_JSON ;
     cromwell run -i $TEST_JSON gatk-preprocess.wdl'
+  files:
+    - path: "test-output/test.bam"
+    - path: "test-output/test.bai"
+    - path: "test-output/test.bqsr"
