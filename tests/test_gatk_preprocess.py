@@ -5,7 +5,7 @@ import pytest
 
 
 @pytest.mark.workflow("recalibrated_bam")
-def test_recalibrated_bam(workflow_dir):
+def test_applybqsr_used(workflow_dir):
     bam_path = workflow_dir / Path("test-output") / Path("test.bam")
     bam_file = pysam.AlignmentFile(str(bam_path), "rb")
     programs = [ program.get('ID') for program in bam_file.header.get('PG') ]
@@ -14,7 +14,7 @@ def test_recalibrated_bam(workflow_dir):
 
 
 @pytest.mark.workflow("split_n_cigar")
-def test_recalibrated_bam(workflow_dir):
+def test_splitncigar_used(workflow_dir):
     bam_path = workflow_dir / Path("test-output") / Path("test.bam")
     bam_file = pysam.AlignmentFile(str(bam_path), "rb")
     programs = [ program.get('ID') for program in bam_file.header.get('PG') ]
@@ -23,7 +23,7 @@ def test_recalibrated_bam(workflow_dir):
 
 
 @pytest.mark.workflow("split_n_cigar_recalibrated_bam")
-def test_recalibrated_bam(workflow_dir):
+def test_applybsqr_and_splitncigar_used(workflow_dir):
     bam_path = workflow_dir / Path("test-output") / Path("test.bam")
     bam_file = pysam.AlignmentFile(str(bam_path), "rb")
     programs = [ program.get('ID') for program in bam_file.header.get('PG') ]
