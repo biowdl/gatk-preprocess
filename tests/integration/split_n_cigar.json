@@ -1,0 +1,17 @@
+{
+  "GatkPreprocess.reference": {
+    "fasta": "tests/data/reference.fasta",
+    "fai": "tests/data/reference.fasta.fai",
+    "dict": "tests/data/reference.dict"
+  },
+  "GatkPreprocess.bamFile": {
+    "file": "tests/data/wgs1.bam",
+    "index": "tests/data/wgs1.bai"
+  },
+  "GatkPreprocess.dbsnpVCF": {
+    "file": "tests/data/wgs2.vcf.gz",
+    "index": "tests/data/wgs2.vcf.gz.tbi"
+  },
+  "GatkPreprocess.splitSplicedReads": true,
+  "GatkPreprocess.scatterSize": 5000
+}

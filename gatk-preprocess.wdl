@@ -13,8 +13,9 @@ workflow GatkPreprocess {
         Boolean splitSplicedReads = false
         Boolean outputRecalibratedBam = false
         IndexedVcfFile dbsnpVCF
-        Int scatterSize = 10000000
-
+        # Scatter size is based on bases in the reference genome. The human genome is approx 3 billion base pairs
+        # With a scatter size of 0.4 billion this will lead to 8 scatters.
+        Int scatterSize = 400000000
         File? regions
     }
 
