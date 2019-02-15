@@ -10,7 +10,7 @@ def test_recalibrated_bam(workflow_dir):
     bam_file = pysam.AlignmentFile(str(bam_path), "rb")
     programs = [ program.get('ID') for program in bam_file.header.get('PG') ]
     assert "GATK ApplyBQSR" in programs
-    assert "GATK SpitNCigarReads" not in programs
+    assert "GATK SplitNCigarReads" not in programs
 
 
 @pytest.mark.workflow("split_n_cigar")
@@ -19,7 +19,7 @@ def test_recalibrated_bam(workflow_dir):
     bam_file = pysam.AlignmentFile(str(bam_path), "rb")
     programs = [ program.get('ID') for program in bam_file.header.get('PG') ]
     assert "GATK ApplyBQSR" not in programs
-    assert "GATK SpitNCigarReads" in programs
+    assert "GATK SplitNCigarReads" in programs
 
 
 @pytest.mark.workflow("split_n_cigar_recalibrated_bam")
@@ -28,4 +28,4 @@ def test_recalibrated_bam(workflow_dir):
     bam_file = pysam.AlignmentFile(str(bam_path), "rb")
     programs = [ program.get('ID') for program in bam_file.header.get('PG') ]
     assert "GATK ApplyBQSR" in programs
-    assert "GATK SpitNCigarReads" in programs
+    assert "GATK SplitNCigarReads" in programs
