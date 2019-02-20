@@ -25,7 +25,6 @@ workflow GatkPreprocess {
     call biopet.ScatterRegions as scatterList {
         input:
             reference = reference,
-            outputDirPath = scatterDir,
             scatterSize = scatterSize,
             notSplitContigs = true,
             regions = regions
@@ -34,8 +33,7 @@ workflow GatkPreprocess {
     # Glob messes with order of scatters (10 comes before 1), which causes problem at gatherBamFiles
     call biopet.ReorderGlobbedScatters as orderedScatters {
         input:
-            scatters = scatterList.scatters,
-            scatterDir = scatterDir
+            scatters = scatterList.scatters
     }
 
     scatter (bed in orderedScatters.reorderedScatters) {
