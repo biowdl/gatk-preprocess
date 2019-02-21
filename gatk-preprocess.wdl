@@ -17,6 +17,11 @@ workflow GatkPreprocess {
         # With a scatter size of 0.4 billion this will lead to 8 scatters.
         Int scatterSize = 400000000
         File? regions
+        Map[String, String] dockerTags = {
+          "picard":"2.18.26--0",
+          "gatk4":"4.1.0.0--0",
+          "biopet-scatterregions": "0.2--0"
+        }
     }
 
     String outputDir = sub(basePath, basename(basePath) + "$", "")
@@ -25,17 +30,16 @@ workflow GatkPreprocess {
     call biopet.ScatterRegions as scatterList {
         input:
             reference = reference,
-            outputDirPath = scatterDir,
             scatterSize = scatterSize,
             notSplitContigs = true,
-            regions = regions
+            regions = regions,
+            dockerTag = dockerTags["biopet-scatterregions"]
     }
 
     # Glob messes with order of scatters (10 comes before 1), which causes problem at gatherBamFiles
     call biopet.ReorderGlobbedScatters as orderedScatters {
         input:
-            scatters = scatterList.scatters,
-            scatterDir = scatterDir
+            scatters = scatterList.scatters
     }
 
     scatter (bed in orderedScatters.reorderedScatters) {
@@ -52,7 +56,8 @@ workflow GatkPreprocess {
     call gatk.GatherBqsrReports as gatherBqsr {
         input:
             inputBQSRreports = baseRecalibrator.recalibrationReport,
-            outputReportPath = basePath + ".bqsr"
+            outputReportPath = basePath + ".bqsr",
+            dockerTag = dockerTags["gatk4"]
     }
 
     scatter (bed in orderedScatters.reorderedScatters) {
@@ -62,7 +67,8 @@ workflow GatkPreprocess {
                     intervals = [bed],
                     reference = reference,
                     inputBam = bamFile,
-                    outputBam = scatterDir + "/" + basename(bed) + ".split.bam"
+                    outputBam = scatterDir + "/" + basename(bed) + ".split.bam",
+                    dockerTag = dockerTags["gatk4"]
             }
 
             File splicedBamFiles = splitNCigarReads.bam.file
@@ -80,7 +86,8 @@ workflow GatkPreprocess {
                     recalibrationReport = gatherBqsr.outputBQSRreport,
                     outputBamPath = if splitSplicedReads
                         then scatterDir + "/" + basename(bed) + ".split.bqsr.bam"
-                        else scatterDir + "/" + basename(bed) + ".bqsr.bam"
+                        else scatterDir + "/" + basename(bed) + ".bqsr.bam",
+                    dockerTag = dockerTags["gatk4"]
             }
 
             File chunkBamFiles = applyBqsr.recalibratedBam.file
@@ -99,7 +106,8 @@ workflow GatkPreprocess {
                 inputBamsIndex = if outputRecalibratedBam
                     then select_all(chunkBamIndexes)
                     else select_all(splicedBamIndexes),
-                outputBamPath = basePath + ".bam"
+                outputBamPath = basePath + ".bam",
+                dockerTag = dockerTags["picard"]
         }
     }
 
