@@ -22,7 +22,7 @@ before_install:
 
 install:
   - conda install cromwell
-  - python3 -m pip install pytest-workflow
+  - python3 -m pip install pytest-workflow pysam
 
 script:
   - python3 -m pytest --tag $TEST
