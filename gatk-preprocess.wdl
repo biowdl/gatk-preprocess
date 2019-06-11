@@ -116,6 +116,7 @@ workflow GatkPreprocess {
                 outputBamPath = basePath + ".bam",
                 dockerTag = dockerTags["picard"]
         }
+
         IndexedBamFile gatheredBam = object {
             file: gatherBamFiles.outputBam,
             index: gatherBamFiles.outputBamIndex,
