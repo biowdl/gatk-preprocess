@@ -46,10 +46,14 @@ workflow GatkPreprocess {
         call gatk.BaseRecalibrator as baseRecalibrator {
             input:
                 sequenceGroupInterval = [bed],
-                reference = reference,
-                inputBam = bamFile,
+                referenceFasta = reference.fasta,
+                referenceFastaFai = reference.fai,
+                referenceFastaDict = reference.dict,
+                inputBam = bamFile.file,
+                inputBamIndex = bamFile.index,
                 recalibrationReportPath = scatterDir + "/" + basename(bed) + ".bqsr",
-                dbsnpVCF = dbsnpVCF
+                dbsnpVCF = dbsnpVCF.file,
+                dbsnpVCFIndex = dbsnpVCF.index
         }
     }
 
@@ -65,33 +69,36 @@ workflow GatkPreprocess {
             call gatk.SplitNCigarReads as splitNCigarReads {
                 input:
                     intervals = [bed],
-                    reference = reference,
-                    inputBam = bamFile,
+                    referenceFasta = reference.fasta,
+                    referenceFastaFai = reference.fai,
+                    referenceFastaDict = reference.dict,
+                    inputBam = bamFile.file,
+                    inputBamIndex = bamFile.index,
                     outputBam = scatterDir + "/" + basename(bed) + ".split.bam",
                     dockerTag = dockerTags["gatk4"]
             }
 
-            File splicedBamFiles = splitNCigarReads.bam.file
-            File splicedBamIndexes = splitNCigarReads.bam.index
         }
 
         if (outputRecalibratedBam) {
             call gatk.ApplyBQSR as applyBqsr {
                 input:
                     sequenceGroupInterval = [bed],
-                    reference = reference,
+                    referenceFasta = reference.fasta,
+                    referenceFastaFai = reference.fai,
+                    referenceFastaDict = reference.dict,
                     inputBam = if splitSplicedReads
                         then select_first([splitNCigarReads.bam])
-                        else bamFile,
+                        else bamFile.file,
+                    inputBamIndex = if splitSplicedReads
+                        then select_first([splitNCigarReads.bamIndex])
+                        else bamFile.index,
                     recalibrationReport = gatherBqsr.outputBQSRreport,
                     outputBamPath = if splitSplicedReads
                         then scatterDir + "/" + basename(bed) + ".split.bqsr.bam"
                         else scatterDir + "/" + basename(bed) + ".bqsr.bam",
                     dockerTag = dockerTags["gatk4"]
             }
-
-            File chunkBamFiles = applyBqsr.recalibratedBam.file
-            File chunkBamIndexes = applyBqsr.recalibratedBam.index
         }
     }
 
@@ -101,18 +108,24 @@ workflow GatkPreprocess {
         call picard.GatherBamFiles as gatherBamFiles {
             input:
                 inputBams = if outputRecalibratedBam
-                    then select_all(chunkBamFiles)
-                    else select_all(splicedBamFiles),
+                    then select_all(applyBqsr.recalibratedBam)
+                    else select_all(splitNCigarReads.bam),
                 inputBamsIndex = if outputRecalibratedBam
-                    then select_all(chunkBamIndexes)
-                    else select_all(splicedBamIndexes),
+                    then select_all(applyBqsr.recalibratedBamIndex)
+                    else select_all(splitNCigarReads.bamIndex),
                 outputBamPath = basePath + ".bam",
                 dockerTag = dockerTags["picard"]
+        }
+
+        IndexedBamFile gatheredBam = object {
+            file: gatherBamFiles.outputBam,
+            index: gatherBamFiles.outputBamIndex,
+            md5: gatherBamFiles.outputBamMd5
         }
     }
 
     output {
-        IndexedBamFile? outputBamFile = gatherBamFiles.outputBam
+        IndexedBamFile? outputBamFile = gatheredBam
         File BQSRreport = gatherBqsr.outputBQSRreport
     }
 }
