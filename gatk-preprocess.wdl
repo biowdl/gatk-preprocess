@@ -8,7 +8,8 @@ import "tasks/common.wdl" as common
 workflow GatkPreprocess {
     input{
         IndexedBamFile bamFile
-        String basePath
+        String bamName = "recalibrated"
+        String outputDir = "."
         Reference reference
         Boolean splitSplicedReads = false
         Boolean outputRecalibratedBam = false
@@ -18,13 +19,12 @@ workflow GatkPreprocess {
         Int scatterSize = 400000000
         File? regions
         Map[String, String] dockerImages = {
-          "picard":"2.18.26--0",
-          "gatk4":"4.1.0.0--0",
-          "biopet-scatterregions": "0.2--0"
+          "picard":"quay.io/biocontainers/picard:2.18.26--0",
+          "gatk4":"quay.io/biocontainers/gatk4:4.1.0.0--0",
+          "biopet-scatterregions":"quay.io/biocontainers/biopet-scatterregions:0.2--0"
         }
     }
 
-    String outputDir = sub(basePath, basename(basePath) + "$", "")
     String scatterDir = outputDir +  "/gatk_preprocess_scatter/"
 
     call biopet.ScatterRegions as scatterList {
@@ -61,7 +61,7 @@ workflow GatkPreprocess {
     call gatk.GatherBqsrReports as gatherBqsr {
         input:
             inputBQSRreports = baseRecalibrator.recalibrationReport,
-            outputReportPath = basePath + ".bqsr",
+            outputReportPath = outputDir + "/" + bamName + ".bqsr",
             dockerImage = dockerImages["gatk4"]
     }
 
@@ -114,7 +114,7 @@ workflow GatkPreprocess {
                 inputBamsIndex = if outputRecalibratedBam
                     then select_all(applyBqsr.recalibratedBamIndex)
                     else select_all(splitNCigarReads.bamIndex),
-                outputBamPath = basePath + ".bam",
+                outputBamPath = outputDir + "/" + bamName + ".bam",
                 dockerImage = dockerImages["picard"]
         }
 
