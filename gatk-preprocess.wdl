@@ -17,7 +17,7 @@ workflow GatkPreprocess {
         # With a scatter size of 0.4 billion this will lead to 8 scatters.
         Int scatterSize = 400000000
         File? regions
-        Map[String, String] dockerTags = {
+        Map[String, String] dockerImages = {
           "picard":"2.18.26--0",
           "gatk4":"4.1.0.0--0",
           "biopet-scatterregions": "0.2--0"
@@ -33,7 +33,7 @@ workflow GatkPreprocess {
             scatterSize = scatterSize,
             notSplitContigs = true,
             regions = regions,
-            dockerTag = dockerTags["biopet-scatterregions"]
+            dockerImage = dockerImages["biopet-scatterregions"]
     }
 
     # Glob messes with order of scatters (10 comes before 1), which causes problem at gatherBamFiles
@@ -53,7 +53,8 @@ workflow GatkPreprocess {
                 inputBamIndex = bamFile.index,
                 recalibrationReportPath = scatterDir + "/" + basename(bed) + ".bqsr",
                 dbsnpVCF = dbsnpVCF.file,
-                dbsnpVCFIndex = dbsnpVCF.index
+                dbsnpVCFIndex = dbsnpVCF.index,
+                dockerImage = dockerImages["gatk4"]
         }
     }
 
@@ -61,7 +62,7 @@ workflow GatkPreprocess {
         input:
             inputBQSRreports = baseRecalibrator.recalibrationReport,
             outputReportPath = basePath + ".bqsr",
-            dockerTag = dockerTags["gatk4"]
+            dockerImage = dockerImages["gatk4"]
     }
 
     scatter (bed in orderedScatters.reorderedScatters) {
@@ -75,7 +76,7 @@ workflow GatkPreprocess {
                     inputBam = bamFile.file,
                     inputBamIndex = bamFile.index,
                     outputBam = scatterDir + "/" + basename(bed) + ".split.bam",
-                    dockerTag = dockerTags["gatk4"]
+                    dockerImage = dockerImages["gatk4"]
             }
 
         }
@@ -97,7 +98,7 @@ workflow GatkPreprocess {
                     outputBamPath = if splitSplicedReads
                         then scatterDir + "/" + basename(bed) + ".split.bqsr.bam"
                         else scatterDir + "/" + basename(bed) + ".bqsr.bam",
-                    dockerTag = dockerTags["gatk4"]
+                    dockerImage = dockerImages["gatk4"]
             }
         }
     }
@@ -114,7 +115,7 @@ workflow GatkPreprocess {
                     then select_all(applyBqsr.recalibratedBamIndex)
                     else select_all(splitNCigarReads.bamIndex),
                 outputBamPath = basePath + ".bam",
-                dockerTag = dockerTags["picard"]
+                dockerImage = dockerImages["picard"]
         }
 
         IndexedBamFile gatheredBam = object {
