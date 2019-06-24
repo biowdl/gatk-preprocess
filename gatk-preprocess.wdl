@@ -14,8 +14,8 @@ workflow GatkPreprocess {
         Boolean outputRecalibratedBam = false
         IndexedVcfFile dbsnpVCF
         # Scatter size is based on bases in the reference genome. The human genome is approx 3 billion base pairs
-        # With a scatter size of 0.4 billion this will lead to 8 scatters.
-        Int scatterSize = 400000000
+        # With a scatter size of 1 billion this will lead to ~3 scatters.
+        Int scatterSize = 1000000000
         File? regions
         Map[String, String] dockerTags = {
           "picard":"2.18.26--0",
