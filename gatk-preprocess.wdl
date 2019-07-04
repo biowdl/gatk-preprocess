@@ -29,7 +29,8 @@ workflow GatkPreprocess {
 
     call biopet.ScatterRegions as scatterList {
         input:
-            reference = reference,
+            referenceFasta = reference.fasta,
+            referenceFastaDict = reference.dict,
             scatterSize = scatterSize,
             notSplitContigs = true,
             regions = regions,
