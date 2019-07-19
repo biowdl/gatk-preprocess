@@ -14,6 +14,5 @@
   },
   "GatkPreprocess.outputRecalibratedBam": true,
   "GatkPreprocess.splitSplicedReads": true,
-  "GatkPreprocess.scatterSize": 5000,
   "GatkPreprocess.bamName": "test"
 }

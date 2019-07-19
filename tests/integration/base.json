@@ -12,6 +12,5 @@
     "file": "tests/data/wgs2.vcf.gz",
     "index": "tests/data/wgs2.vcf.gz.tbi"
   },
-  "GatkPreprocess.scatterSize": 5000,
   "GatkPreprocess.bamName": "test"
 }

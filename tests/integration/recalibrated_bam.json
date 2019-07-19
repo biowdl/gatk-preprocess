@@ -13,6 +13,5 @@
     "index": "tests/data/wgs2.vcf.gz.tbi"
   },
   "GatkPreprocess.outputRecalibratedBam": true,
-  "GatkPreprocess.scatterSize": 5000,
   "GatkPreprocess.bamName": "test"
 }
