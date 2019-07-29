@@ -19,8 +19,8 @@
     cromwell run -o tests/cromwell_options.json
     -i tests/integration/recalibrated_bam.json gatk-preprocess.wdl
   files:
-    - path: "test-output/test.bam"
-    - path: "test-output/test.bai"
+    - path: "test-output/test.bqsr.bam"
+    - path: "test-output/test.bqsr.bai"
     - path: "test-output/test.bqsr"
 
 - name: split_n_cigar
@@ -30,8 +30,8 @@
     cromwell run -o tests/cromwell_options.json
     -i tests/integration/split_n_cigar.json gatk-preprocess.wdl
   files:
-    - path: "test-output/test.bam"
-    - path: "test-output/test.bai"
+    - path: "test-output/test.split.bam"
+    - path: "test-output/test.split.bai"
     - path: "test-output/test.bqsr"
 
 - name: split_n_cigar_recalibrated_bam
@@ -41,6 +41,6 @@
     cromwell run -o tests/cromwell_options.json
     -i tests/integration/split_n_cigar_recalibrated_bam.json gatk-preprocess.wdl
   files:
-    - path: "test-output/test.bam"
-    - path: "test-output/test.bai"
+    - path: "test-output/test.split.bqsr.bam"
+    - path: "test-output/test.split.bqsr.bai"
     - path: "test-output/test.bqsr"
