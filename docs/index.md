@@ -84,7 +84,7 @@ need a custom configuration to allow this.
     "fai": "/home/user/genomes/human/GRCh38.fasta.fai",
     "dict": "/home/user/genomes/human/GRCh38.dict"
   },
-  "GatkPreprocess.basePath": "/home/user/mapping/results/s1_preprocessed",
+  "GatkPreprocess.bamName": "s1_preprocessed",
   "GatkPreprocess.dbsnpVCF": {
     "file": "/home/user/genomes/human/dbsnp/dbsnp-151.vcf.gz",
     "index": "/home/user/genomes/human/dbsnp/dbsnp-151.vcf.gz.tbi"
