@@ -35,7 +35,7 @@ about pipeline inputs.
     "fai": "The path to the index associated with the reference fasta",
     "dict": "The path to the dict file associated with the reference fasta"
   },
-  "GatkPreprocess.basePath": "The base bath (prefix) for the output. The final output will be <basePath>.bam or <basePath>.bqsr",
+  "GatkPreprocess.bamName": "The name for the output bam. The final output will be <bamName>.bam or <bamName>.bqsr",
   "GatkPreprocess.dbsnpVCF": {
     "file": "A path to a dbSNP VCF file",
     "index": "The path to the index (.tbi) file associated with the dbSNP VCF"
@@ -57,6 +57,24 @@ Some additional inputs that may be of interest are:
 }
 
 ```
+An output directory can be set using an `options.json` file. See [the
+cromwell documentation](
+https://cromwell.readthedocs.io/en/stable/wf_options/Overview/) for more
+information.
+
+Example `options.json` file:
+```JSON
+{
+"final_workflow_outputs_dir": "my-analysis-output",
+"use_relative_output_paths": true,
+"default_runtime_attributes": {
+  "docker_user": "$EUID"
+  }
+}
+```
+Alternatively an output directory can be set with `GatkPreprocess.outputDir`.
+`GatkPreprocess.outputDir` must be mounted in the docker container. Cromwell will
+need a custom configuration to allow this.
 
 #### Example
 ```json
@@ -81,14 +99,22 @@ Some additional inputs that may be of interest are:
 ```
 
 ### Dependency requirements and tool versions
-Included in the repository is an `environment.yml` file. This file includes
-all the tool version on which the workflow was tested. You can use conda and
-this file to create an environment with all the correct tools.
+Biowdl pipelines use docker images to ensure  reproducibility. This
+means that biowdl pipelines will run on any system that has docker
+installed. Alternatively they can be run with singularity.
+
+For more advanced configuration of docker or singularity please check
+the [cromwell documentation on containers](
+https://cromwell.readthedocs.io/en/stable/tutorials/Containers/).
+
+Images from [biocontainers](https://biocontainers.pro) are preferred for
+biowdl pipelines. The list of default images for this pipeline can be
+found in the default for the `dockerImages` input.
 
 ### Output
-This workflow will produce a BQSR report named according to the `basePath`
-input (basePath + '.bqsr'). If one of the `splitSplicedReads` or
-`outputRecalibratedBam` inputs is set to true, a new BAM file (basePath +
+This workflow will produce a BQSR report named according to the `bamName`
+input (bamName + '.bqsr'). If one of the `splitSplicedReads` or
+`outputRecalibratedBam` inputs is set to true, a new BAM file (bamName +
 '.bam') will be produced as well.
 
 ## Scattering
