@@ -11,4 +11,4 @@ that users understand how the changes affect the new version.
 
 version 1.0.0-dev
 ---------------------------
-+ <a change>
++ fixed the md5sum key in gatheredBam (md5 -> md5sum)
