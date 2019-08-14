@@ -122,7 +122,7 @@ workflow GatkPreprocess {
         IndexedBamFile gatheredBam = object {
             file: gatherBamFiles.outputBam,
             index: gatherBamFiles.outputBamIndex,
-            md5: gatherBamFiles.outputBamMd5
+            md5sum: gatherBamFiles.outputBamMd5
         }
     }
 
