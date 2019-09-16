@@ -1,8 +1,6 @@
 ---
 layout: default
 title: Home
-version: develop
-latest: false
 ---
 
 This workflow performs preprocessing steps required for variantcalling based
@@ -24,9 +22,7 @@ java -jar cromwell-<version>.jar run -i inputs.json gatk-preprocess.wdl
 Inputs are provided through a JSON file. The minimally required inputs are
 described below and a template containing all possible inputs can be generated
 using Womtool as described in the
-[WOMtool documentation](http://cromwell.readthedocs.io/en/stable/WOMtool/). See
-[this page](/inputs.html) for some additional general notes and information
-about pipeline inputs.
+[WOMtool documentation](http://cromwell.readthedocs.io/en/stable/WOMtool/).
 
 ```json
 {
