@@ -6,10 +6,11 @@ pipeline {
     }
     parameters {
         string name: 'PYTHON', defaultValue: '${DEFAULT}'
-        string name: 'CROMWELL_BIN', defaultValue: '${DEFAULT}'
         string name: 'THREADS', defaultValue: '${DEFAULT}'
         string name: 'OUTPUT_DIR', defaultValue: '${DEFAULT}'
         string name: 'TAGS', defaultValue: '${DEFAULT}'
+        string name: 'LINT', defaultValue: '${DEFAULT}'
+        string name: 'CROMWELL_PATH', defaultValue: '${DEFAULT}'
     }
     stages {
         stage('Init') {
@@ -36,6 +37,13 @@ pipeline {
             }
         }
 
+        stage('lint') {
+            when { environment name: 'LINT', value: 'true' }
+            steps {
+                sh 'bash -c "PATH=$PATH:$CROMWELL_PATH bash scripts/biowdl_lint.sh"'
+            }
+        }
+
         stage('Submodules develop') {
             when {
                 branch 'develop'
@@ -50,23 +58,9 @@ pipeline {
             steps {
                 sh "#!/bin/bash\n" +
                         "set -e -v  -o pipefail\n" +
-                        "export PATH=$PATH:$CROMWELL_BIN\n" +
+                        "export PATH=$PATH:$CROMWELL_PATH\n" +
                         "${PYTHON} -m pytest -v --keep-workflow-wd --workflow-threads ${THREADS} --basetemp ${outputDir} ${TAGS} tests/"
             }
-        }
-    }
-    post {
-        failure {
-            slackSend(color: '#FF0000', message: "Failure: Job '${env.JOB_NAME} #${env.BUILD_NUMBER}' (<${env.BUILD_URL}|Open>)", channel: '#biopet-bot', teamDomain: 'lumc', tokenCredentialId: 'lumc')
-        }
-        unstable {
-            slackSend(color: '#FFCC00', message: "Unstable: Job '${env.JOB_NAME} #${env.BUILD_NUMBER}' (<${env.BUILD_URL}|Open>)", channel: '#biopet-bot', teamDomain: 'lumc', tokenCredentialId: 'lumc')
-        }
-        aborted {
-            slackSend(color: '#7f7f7f', message: "Aborted: Job '${env.JOB_NAME} #${env.BUILD_NUMBER}' (<${env.BUILD_URL}|Open>)", channel: '#biopet-bot', teamDomain: 'lumc', tokenCredentialId: 'lumc')
-        }
-        success {
-            slackSend(color: '#00FF00', message: "Success: Job '${env.JOB_NAME} #${env.BUILD_NUMBER}' (<${env.BUILD_URL}|Open>)", channel: '#biopet-bot', teamDomain: 'lumc', tokenCredentialId: 'lumc')
         }
     }
 }
