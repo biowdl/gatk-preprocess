@@ -130,4 +130,24 @@ workflow GatkPreprocess {
         IndexedBamFile? outputBamFile = gatheredBam
         File BQSRreport = gatherBqsr.outputBQSRreport
     }
+
+    parameter_meta {
+        bamFile: {description: "The BAM file which should be processed and its index.",
+                  category: "required"}
+        bamName: {description: "The basename for the produced BAM files. This should not include any parent direcoties, use `outputDir` if the output directory should be changed.",
+                  category: "common"}
+        outputDir: {description: "The directory to which the outputs will be written.", category: "common"}
+        reference: {description: "The reference files: a fasta, its index and sequence dictionary.", category: "required"}
+        splitSplicedReads: {description: "Whether or not gatk's SplitNCgarReads should be run to split spliced reads. This should be enabled for RNAseq samples.",
+                            category: "common"}
+        outputRecalibratedBam: {description: "Whether or not a base quality score recalibrated BAM file will be outputed.",
+                                category: "advanced"}
+        dbsnpVCF: {description: "A dbSNP vcf and its index.", category: "required"}
+
+        scatterSize: {description: "The size of the scattered regions in bases. Scattering is used to speed up certain processes. The genome will be sseperated into multiple chunks (scatters) which will be processed in their own job, allowing for parallel processing. Higher values will result in a lower number of jobs. The optimal value here will depend on the available resources.",
+                      category: "advanced"}
+        regions: {description: "A bed file describing the regions to operate on.", category: "common"}
+        dockerImages: {description: "The docker images used. Changing this may result in errors which the developers may choose not to address.",
+                       category: "advanced"}
+    }
 }
