@@ -6,7 +6,8 @@ title: Home
 This workflow performs preprocessing steps required for variantcalling based
 on the
 [GATK Best Practices](https://software.broadinstitute.org/gatk/best-practices/).
-This workflow can be used for both DNA data and RNA-seq data.
+This workflow can be used for both DNA data and RNA-seq data. It recalibrates
+a BAM file and optionally splits spliced reads.
 
 This workflow is part of [BioWDL](https://biowdl.github.io/)
 developed by the SASC team at [Leiden University Medical Center](https://www.lumc.nl/).
@@ -41,7 +42,6 @@ Some additional inputs that may be of interest are:
 ```json
 {
   "GatkPreprocess.scatterSize": "The size of scatter regions (see explanation of scattering below), defaults to 10,000,000",
-  "GatkPreprocess.outputRecalibratedBam": "Whether or not a recalibrated BAM file should be outputted, defaults to false",
   "GatkPreprocess.splitSplicedReads": "Whether or not SplitNCigarReads should be executed (recommended for RNA-seq data), defaults to false",
   "GatkPreprocess.scatterList.regions": "A bed file for which preprocessing will be performed"
 }
@@ -77,8 +77,7 @@ need a custom configuration to allow this.
   "GatkPreprocess.dbsnpVCFIndex": "/home/user/genomes/human/dbsnp/dbsnp-151.vcf.gz.tbi",
   "GatkPreprocess.bam": "home/user/mapping/results/s1.bam",
   "GatkPreprocess.bamIndex":"/home/user/mapping/results/s1.bai",
-  "GatkPreprocess.splitSplicedReads": true,
-  "GatkPreprocess.outputRecalibratedBam": true
+  "GatkPreprocess.splitSplicedReads": true
 }
 ```
 
