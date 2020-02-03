@@ -11,6 +11,7 @@ that users understand how the changes affect the new version.
 
 version 2.0.0-dev
 -----------------
++ Correctly apply base recalibration after the reads have been spliced.
 + Remove structs from input and output.
 + Added inputs overview to the docs.
 + Added parameter_meta.
