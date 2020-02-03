@@ -26,20 +26,14 @@ using Womtool as described in the
 For an overview of all available inputs, see [this page](./inputs.html).
 ```json
 {
-  "GatkPreprocess.reference": {
-    "fasta": "A path to a reference fasta",
-    "fai": "The path to the index associated with the reference fasta",
-    "dict": "The path to the dict file associated with the reference fasta"
-  },
+  "BamMetrics.referenceFasta": "The path to the reference fasta file",
+  "BamMetrics.referenceFastaFai": "The path to the index for the reference fasta",
+  "BamMetrics.referenceFastaDict": "The path to the sequence dictionary dict file for the reference fasta",
+  "BamMetrics.bam": "A path to an input BAM file",
+  "BamMetrics.bamIndex": "A path to the index of the BAM file.",
   "GatkPreprocess.bamName": "The name for the output bam. The final output will be <bamName>.bam or <bamName>.bqsr",
-  "GatkPreprocess.dbsnpVCF": {
-    "file": "A path to a dbSNP VCF file",
-    "index": "The path to the index (.tbi) file associated with the dbSNP VCF"
-  },
-  "GatkPreprocess.bamFile": {
-    "file": "The path to an input BAM file",
-    "index":"The path to the index for the input BAM file"
-  }
+  "GatkPreprocess.dbsnpVCF": "A path to a dbSNP VCF file",
+  "GatkPreprocess.dbsnpVCFIndex": "The path to the index (.tbi) file associated with the dbSNP VCF"
 }
 ```
 
@@ -75,20 +69,14 @@ need a custom configuration to allow this.
 #### Example
 ```json
 {
-  "GatkPreprocess.reference": {
-    "fasta": "/home/user/genomes/human/GRCh38.fasta",
-    "fai": "/home/user/genomes/human/GRCh38.fasta.fai",
-    "dict": "/home/user/genomes/human/GRCh38.dict"
-  },
+  "GatkPreprocess.referenceFasta": "/home/user/genomes/human/GRCh38.fasta",
+  "GatkPreprocess.referenceFastaFai": "/home/user/genomes/human/GRCh38.fasta.fai",
+  "GatkPreprocess.referenceFastadict": "/home/user/genomes/human/GRCh38.dict",
   "GatkPreprocess.bamName": "s1_preprocessed",
-  "GatkPreprocess.dbsnpVCF": {
-    "file": "/home/user/genomes/human/dbsnp/dbsnp-151.vcf.gz",
-    "index": "/home/user/genomes/human/dbsnp/dbsnp-151.vcf.gz.tbi"
-  },
-  "GatkPreprocess.bamFile": {
-    "file": "/home/user/mapping/results/s1.bam",
-    "index":"/home/user/mapping/results/s1.bai"
-  },
+  "GatkPreprocess.dbsnpVCF": "/home/user/genomes/human/dbsnp/dbsnp-151.vcf.gz",
+  "GatkPreprocess.dbsnpVCFIndex": "/home/user/genomes/human/dbsnp/dbsnp-151.vcf.gz.tbi",
+  "GatkPreprocess.bam": "home/user/mapping/results/s1.bam",
+  "GatkPreprocess.bamIndex":"/home/user/mapping/results/s1.bai",
   "GatkPreprocess.splitSplicedReads": true,
   "GatkPreprocess.outputRecalibratedBam": true
 }
