@@ -26,11 +26,11 @@ using Womtool as described in the
 For an overview of all available inputs, see [this page](./inputs.html).
 ```json
 {
-  "BamMetrics.referenceFasta": "The path to the reference fasta file",
-  "BamMetrics.referenceFastaFai": "The path to the index for the reference fasta",
-  "BamMetrics.referenceFastaDict": "The path to the sequence dictionary dict file for the reference fasta",
-  "BamMetrics.bam": "A path to an input BAM file",
-  "BamMetrics.bamIndex": "A path to the index of the BAM file.",
+  "GatkPreprocess.referenceFasta": "The path to the reference fasta file",
+  "GatkPreprocess.referenceFastaFai": "The path to the index for the reference fasta",
+  "GatkPreprocess.referenceFastaDict": "The path to the sequence dictionary dict file for the reference fasta",
+  "GatkPreprocess.bam": "A path to an input BAM file",
+  "GatkPreprocess.bamIndex": "A path to the index of the BAM file.",
   "GatkPreprocess.bamName": "The name for the output bam. The final output will be <bamName>.bam or <bamName>.bqsr",
   "GatkPreprocess.dbsnpVCF": "A path to a dbSNP VCF file",
   "GatkPreprocess.dbsnpVCFIndex": "The path to the index (.tbi) file associated with the dbSNP VCF"
