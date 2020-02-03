@@ -116,14 +116,14 @@ workflow GatkPreprocess {
     }
 
     parameter_meta {
-        bamFile: {description: "The BAM file which should be processed", category: "required"}
+        bam: {description: "The BAM file which should be processed", category: "required"}
         bamIndex: {description: "The index for the BAM file", category: "required"}
         bamName: {description: "The basename for the produced BAM files. This should not include any parent direcoties, use `outputDir` if the output directory should be changed.",
                   category: "common"}
         outputDir: {description: "The directory to which the outputs will be written.", category: "common"}
         referenceFasta: {description: "The reference fasta file", category: "required"}
         referenceFastaFai: {description: "Fasta index (.fai) for the reference fasta file", category: "required"}
-        referenceFastaFai: {description: "Sequence dictionary (.dict) for the reference fasta file", category: "required"}
+        referenceFastaDict: {description: "Sequence dictionary (.dict) for the reference fasta file", category: "required"}
         splitSplicedReads: {description: "Whether or not gatk's SplitNCgarReads should be run to split spliced reads. This should be enabled for RNAseq samples.",
                             category: "common"}
         dbsnpVCF: {description: "A dbSNP vcf.", category: "required"}
