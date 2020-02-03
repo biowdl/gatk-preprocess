@@ -1,18 +1,11 @@
 {
-  "GatkPreprocess.reference": {
-    "fasta": "tests/data/reference.fasta",
-    "fai": "tests/data/reference.fasta.fai",
-    "dict": "tests/data/reference.dict"
-  },
-  "GatkPreprocess.bamFile": {
-    "file": "tests/data/wgs1.bam",
-    "index": "tests/data/wgs1.bai"
-  },
-  "GatkPreprocess.dbsnpVCF": {
-    "file": "tests/data/wgs2.vcf.gz",
-    "index": "tests/data/wgs2.vcf.gz.tbi"
-  },
-  "GatkPreprocess.outputRecalibratedBam": true,
+  "GatkPreprocess.referenceFasta": "tests/data/reference.fasta",
+  "GatkPreprocess.referenceFastaFai": "tests/data/reference.fasta.fai",
+  "GatkPreprocess.referenceFastaDict": "tests/data/reference.dict",
+  "GatkPreprocess.bam": "tests/data/wgs1.bam",
+  "GatkPreprocess.bamIndex": "tests/data/wgs1.bai",
+  "GatkPreprocess.dbsnpVCF": "tests/data/wgs2.vcf.gz",
+  "GatkPreprocess.dbsnpVCFIndex": "tests/data/wgs2.vcf.gz.tbi",
   "GatkPreprocess.scatterSize": 5000,
   "GatkPreprocess.bamName": "test"
 }

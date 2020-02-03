@@ -1,17 +1,3 @@
-- name: base
-  tags:
-    - integration
-  command: >-
-    cromwell run -o tests/cromwell_options.json
-    -i tests/integration/base.json gatk-preprocess.wdl
-  files:
-    - path: "test-output/test.bam"
-      should_exist: false
-    - path: "test-output/test.bai"
-      should_exist: false
-    - path: "test-output/test.bqsr"
-
-
 - name: recalibrated_bam
   tags:
     - integration
@@ -29,17 +15,6 @@
   command: >-
     cromwell run -o tests/cromwell_options.json
     -i tests/integration/split_n_cigar.json gatk-preprocess.wdl
-  files:
-    - path: "test-output/test.bam"
-    - path: "test-output/test.bai"
-    - path: "test-output/test.bqsr"
-
-- name: split_n_cigar_recalibrated_bam
-  tags:
-    - integration
-  command: >-
-    cromwell run -o tests/cromwell_options.json
-    -i tests/integration/split_n_cigar_recalibrated_bam.json gatk-preprocess.wdl
   files:
     - path: "test-output/test.bam"
     - path: "test-output/test.bai"

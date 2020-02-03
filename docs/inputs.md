@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Inputs
+title: "Inputs: GatkPreprocess"
 ---
 
 # Inputs for GatkPreprocess
@@ -11,20 +11,40 @@ GatkPreprocess.
 
 ## Required inputs
 <dl>
-<dt id="GatkPreprocess.bamFile"><a href="#GatkPreprocess.bamFile">GatkPreprocess.bamFile</a></dt>
+<dt id="GatkPreprocess.bam"><a href="#GatkPreprocess.bam">GatkPreprocess.bam</a></dt>
 <dd>
-    <i>struct(file : File, index : File, md5sum : String?) </i><br />
-    The BAM file which should be processed and its index.
+    <i>File </i><br />
+    The BAM file which should be processed
+</dd>
+<dt id="GatkPreprocess.bamIndex"><a href="#GatkPreprocess.bamIndex">GatkPreprocess.bamIndex</a></dt>
+<dd>
+    <i>File </i><br />
+    The index for the BAM file
 </dd>
 <dt id="GatkPreprocess.dbsnpVCF"><a href="#GatkPreprocess.dbsnpVCF">GatkPreprocess.dbsnpVCF</a></dt>
 <dd>
-    <i>struct(file : File, index : File, md5sum : String?) </i><br />
-    A dbSNP vcf and its index.
+    <i>File </i><br />
+    A dbSNP vcf.
 </dd>
-<dt id="GatkPreprocess.reference"><a href="#GatkPreprocess.reference">GatkPreprocess.reference</a></dt>
+<dt id="GatkPreprocess.dbsnpVCFIndex"><a href="#GatkPreprocess.dbsnpVCFIndex">GatkPreprocess.dbsnpVCFIndex</a></dt>
 <dd>
-    <i>struct(dict : File, fai : File, fasta : File) </i><br />
-    The reference files: a fasta, its index and sequence dictionary.
+    <i>File </i><br />
+    Index for dbSNP vcf.
+</dd>
+<dt id="GatkPreprocess.referenceFasta"><a href="#GatkPreprocess.referenceFasta">GatkPreprocess.referenceFasta</a></dt>
+<dd>
+    <i>File </i><br />
+    The reference fasta file
+</dd>
+<dt id="GatkPreprocess.referenceFastaDict"><a href="#GatkPreprocess.referenceFastaDict">GatkPreprocess.referenceFastaDict</a></dt>
+<dd>
+    <i>File </i><br />
+    Sequence dictionary (.dict) for the reference fasta file
+</dd>
+<dt id="GatkPreprocess.referenceFastaFai"><a href="#GatkPreprocess.referenceFastaFai">GatkPreprocess.referenceFastaFai</a></dt>
+<dd>
+    <i>File </i><br />
+    Fasta index (.fai) for the reference fasta file
 </dd>
 </dl>
 
@@ -79,7 +99,7 @@ GatkPreprocess.
 <dt id="GatkPreprocess.baseRecalibrator.knownIndelsSitesVCFs"><a href="#GatkPreprocess.baseRecalibrator.knownIndelsSitesVCFs">GatkPreprocess.baseRecalibrator.knownIndelsSitesVCFs</a></dt>
 <dd>
     <i>Array[File] </i><i>&mdash; Default:</i> <code>[]</code><br />
-    VCf files with known indels.
+    VCF files with known indels.
 </dd>
 <dt id="GatkPreprocess.baseRecalibrator.memory"><a href="#GatkPreprocess.baseRecalibrator.memory">GatkPreprocess.baseRecalibrator.memory</a></dt>
 <dd>
@@ -115,11 +135,6 @@ GatkPreprocess.
 <dd>
     <i>String </i><i>&mdash; Default:</i> <code>"python:3.7-slim"</code><br />
     The docker image used for this task. Changing this may result in errors which the developers may choose not to address.
-</dd>
-<dt id="GatkPreprocess.outputRecalibratedBam"><a href="#GatkPreprocess.outputRecalibratedBam">GatkPreprocess.outputRecalibratedBam</a></dt>
-<dd>
-    <i>Boolean </i><i>&mdash; Default:</i> <code>false</code><br />
-    Whether or not a base quality score recalibrated BAM file will be outputed.
 </dd>
 <dt id="GatkPreprocess.scatterList.bamFile"><a href="#GatkPreprocess.scatterList.bamFile">GatkPreprocess.scatterList.bamFile</a></dt>
 <dd>

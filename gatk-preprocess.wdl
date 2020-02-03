@@ -3,17 +3,19 @@ version 1.0
 import "tasks/biopet/biopet.wdl" as biopet
 import "tasks/gatk.wdl" as gatk
 import "tasks/picard.wdl" as picard
-import "tasks/common.wdl" as common
 
 workflow GatkPreprocess {
     input{
-        IndexedBamFile bamFile
+        File bam
+        File bamIndex
         String bamName = "recalibrated"
         String outputDir = "."
-        Reference reference
+        File referenceFasta
+        File referenceFastaFai
+        File referenceFastaDict
         Boolean splitSplicedReads = false
-        Boolean outputRecalibratedBam = false
-        IndexedVcfFile dbsnpVCF
+        File dbsnpVCF
+        File dbsnpVCFIndex
         # Scatter size is based on bases in the reference genome. The human genome is approx 3 billion base pairs
         # With a scatter size of 1 billion this will lead to ~3 scatters.
         Int scatterSize = 1000000000
@@ -29,8 +31,8 @@ workflow GatkPreprocess {
 
     call biopet.ScatterRegions as scatterList {
         input:
-            referenceFasta = reference.fasta,
-            referenceFastaDict = reference.dict,
+            referenceFasta = referenceFasta,
+            referenceFastaDict = referenceFastaDict,
             scatterSize = scatterSize,
             notSplitContigs = true,
             regions = regions,
@@ -44,17 +46,32 @@ workflow GatkPreprocess {
     }
 
     scatter (bed in orderedScatters.reorderedScatters) {
+
+        if (splitSplicedReads) {
+            call gatk.SplitNCigarReads as splitNCigarReads {
+                input:
+                    intervals = [bed],
+                    referenceFasta = referenceFasta,
+                    referenceFastaFai = referenceFastaFai,
+                    referenceFastaDict = referenceFastaDict,
+                    inputBam = bam,
+                    inputBamIndex = bamIndex,
+                    outputBam = scatterDir + "/" + basename(bed) + ".split.bam",
+                    dockerImage = dockerImages["gatk4"]
+            }
+        }
+
         call gatk.BaseRecalibrator as baseRecalibrator {
             input:
                 sequenceGroupInterval = [bed],
-                referenceFasta = reference.fasta,
-                referenceFastaFai = reference.fai,
-                referenceFastaDict = reference.dict,
-                inputBam = bamFile.file,
-                inputBamIndex = bamFile.index,
+                referenceFasta = referenceFasta,
+                referenceFastaFai = referenceFastaFai,
+                referenceFastaDict = referenceFastaDict,
+                inputBam = select_first([splitNCigarReads.bam, bam]),
+                inputBamIndex = select_first([splitNCigarReads.bamIndex, bamIndex]),
                 recalibrationReportPath = scatterDir + "/" + basename(bed) + ".bqsr",
-                dbsnpVCF = dbsnpVCF.file,
-                dbsnpVCFIndex = dbsnpVCF.index,
+                dbsnpVCF = dbsnpVCF,
+                dbsnpVCFIndex = dbsnpVCFIndex,
                 dockerImage = dockerImages["gatk4"]
         }
     }
@@ -66,83 +83,51 @@ workflow GatkPreprocess {
             dockerImage = dockerImages["gatk4"]
     }
 
-    scatter (bed in orderedScatters.reorderedScatters) {
-        if (splitSplicedReads) {
-            call gatk.SplitNCigarReads as splitNCigarReads {
-                input:
-                    intervals = [bed],
-                    referenceFasta = reference.fasta,
-                    referenceFastaFai = reference.fai,
-                    referenceFastaDict = reference.dict,
-                    inputBam = bamFile.file,
-                    inputBamIndex = bamFile.index,
-                    outputBam = scatterDir + "/" + basename(bed) + ".split.bam",
-                    dockerImage = dockerImages["gatk4"]
-            }
-
-        }
-
-        if (outputRecalibratedBam) {
-            call gatk.ApplyBQSR as applyBqsr {
-                input:
-                    sequenceGroupInterval = [bed],
-                    referenceFasta = reference.fasta,
-                    referenceFastaFai = reference.fai,
-                    referenceFastaDict = reference.dict,
-                    inputBam = if splitSplicedReads
-                        then select_first([splitNCigarReads.bam])
-                        else bamFile.file,
-                    inputBamIndex = if splitSplicedReads
-                        then select_first([splitNCigarReads.bamIndex])
-                        else bamFile.index,
-                    recalibrationReport = gatherBqsr.outputBQSRreport,
-                    outputBamPath = if splitSplicedReads
-                        then scatterDir + "/" + basename(bed) + ".split.bqsr.bam"
-                        else scatterDir + "/" + basename(bed) + ".bqsr.bam",
-                    dockerImage = dockerImages["gatk4"]
-            }
+    scatter (index in range(length(orderedScatters.reorderedScatters))) {
+        call gatk.ApplyBQSR as applyBqsr {
+            input:
+                sequenceGroupInterval = [orderedScatters.reorderedScatters[index]],
+                referenceFasta = referenceFasta,
+                referenceFastaFai = referenceFastaFai,
+                referenceFastaDict = referenceFastaDict,
+                inputBam = select_first([splitNCigarReads.bam[index], bam]),
+                inputBamIndex = select_first([splitNCigarReads.bamIndex[index], bamIndex]),
+                recalibrationReport = gatherBqsr.outputBQSRreport,
+                outputBamPath = if splitSplicedReads
+                    then scatterDir + "/" + basename(orderedScatters.reorderedScatters[index]) + ".split.bqsr.bam"
+                    else scatterDir + "/" + basename(orderedScatters.reorderedScatters[index]) + ".bqsr.bam",
+                dockerImage = dockerImages["gatk4"]
         }
     }
 
-    # If splitSplicedReads a is true a new bam file should be made even if
-    # ouputRecalibratedBam is false.
-    if (outputRecalibratedBam || splitSplicedReads) {
-        call picard.GatherBamFiles as gatherBamFiles {
-            input:
-                inputBams = if outputRecalibratedBam
-                    then select_all(applyBqsr.recalibratedBam)
-                    else select_all(splitNCigarReads.bam),
-                inputBamsIndex = if outputRecalibratedBam
-                    then select_all(applyBqsr.recalibratedBamIndex)
-                    else select_all(splitNCigarReads.bamIndex),
-                outputBamPath = outputDir + "/" + bamName + ".bam",
-                dockerImage = dockerImages["picard"]
-        }
 
-        IndexedBamFile gatheredBam = object {
-            file: gatherBamFiles.outputBam,
-            index: gatherBamFiles.outputBamIndex,
-            md5sum: gatherBamFiles.outputBamMd5
-        }
+    call picard.GatherBamFiles as gatherBamFiles {
+        input:
+            inputBams = applyBqsr.recalibratedBam,
+            inputBamsIndex = applyBqsr.recalibratedBamIndex,
+            outputBamPath = outputDir + "/" + bamName + ".bam",
+            dockerImage = dockerImages["picard"]
     }
 
     output {
-        IndexedBamFile? outputBamFile = gatheredBam
+        File recalibratedBam = gatherBamFiles.outputBam
+        File recalibratedBamIndex = gatherBamFiles.outputBamIndex
         File BQSRreport = gatherBqsr.outputBQSRreport
     }
 
     parameter_meta {
-        bamFile: {description: "The BAM file which should be processed and its index.",
-                  category: "required"}
+        bam: {description: "The BAM file which should be processed", category: "required"}
+        bamIndex: {description: "The index for the BAM file", category: "required"}
         bamName: {description: "The basename for the produced BAM files. This should not include any parent direcoties, use `outputDir` if the output directory should be changed.",
                   category: "common"}
         outputDir: {description: "The directory to which the outputs will be written.", category: "common"}
-        reference: {description: "The reference files: a fasta, its index and sequence dictionary.", category: "required"}
+        referenceFasta: {description: "The reference fasta file", category: "required"}
+        referenceFastaFai: {description: "Fasta index (.fai) for the reference fasta file", category: "required"}
+        referenceFastaDict: {description: "Sequence dictionary (.dict) for the reference fasta file", category: "required"}
         splitSplicedReads: {description: "Whether or not gatk's SplitNCgarReads should be run to split spliced reads. This should be enabled for RNAseq samples.",
                             category: "common"}
-        outputRecalibratedBam: {description: "Whether or not a base quality score recalibrated BAM file will be outputed.",
-                                category: "advanced"}
-        dbsnpVCF: {description: "A dbSNP vcf and its index.", category: "required"}
+        dbsnpVCF: {description: "A dbSNP vcf.", category: "required"}
+        dbsnpVCFIndex: {description: "Index for dbSNP vcf.", category: "required"}
 
         scatterSize: {description: "The size of the scattered regions in bases. Scattering is used to speed up certain processes. The genome will be sseperated into multiple chunks (scatters) which will be processed in their own job, allowing for parallel processing. Higher values will result in a lower number of jobs. The optimal value here will depend on the available resources.",
                       category: "advanced"}

@@ -9,8 +9,11 @@ This document is user facing. Please word the changes in such a way
 that users understand how the changes affect the new version.
 -->
 
-version 1.2.0-dev
+version 2.0.0-dev
 -----------------
++ Remove option to recalibrate or not. The bam file is always recalibrated.
++ Correctly apply base recalibration after the reads have been spliced.
++ Remove structs from input and output.
 + Added inputs overview to the docs.
 + Added parameter_meta.
 + Added wdl-aid to linting.
