@@ -39,13 +39,7 @@ workflow GatkPreprocess {
             dockerImage = dockerImages["biopet-scatterregions"]
     }
 
-    # Glob messes with order of scatters (10 comes before 1), which causes problem at gatherBamFiles
-    call biopet.ReorderGlobbedScatters as orderedScatters {
-        input:
-            scatters = scatterList.scatters
-    }
-
-    scatter (bed in orderedScatters.reorderedScatters) {
+    scatter (bed in scatterList.scatters) {
 
         if (splitSplicedReads) {
             call gatk.SplitNCigarReads as splitNCigarReads {
@@ -83,10 +77,10 @@ workflow GatkPreprocess {
             dockerImage = dockerImages["gatk4"]
     }
 
-    scatter (index in range(length(orderedScatters.reorderedScatters))) {
+    scatter (index in range(length(scatterList.scatters))) {
         call gatk.ApplyBQSR as applyBqsr {
             input:
-                sequenceGroupInterval = [orderedScatters.reorderedScatters[index]],
+                sequenceGroupInterval = [scatterList.scatters[index]],
                 referenceFasta = referenceFasta,
                 referenceFastaFai = referenceFastaFai,
                 referenceFastaDict = referenceFastaDict,
@@ -94,8 +88,8 @@ workflow GatkPreprocess {
                 inputBamIndex = select_first([splitNCigarReads.bamIndex[index], bamIndex]),
                 recalibrationReport = gatherBqsr.outputBQSRreport,
                 outputBamPath = if splitSplicedReads
-                    then scatterDir + "/" + basename(orderedScatters.reorderedScatters[index]) + ".split.bqsr.bam"
-                    else scatterDir + "/" + basename(orderedScatters.reorderedScatters[index]) + ".bqsr.bam",
+                    then scatterDir + "/" + basename(scatterList.scatters[index]) + ".split.bqsr.bam"
+                    else scatterDir + "/" + basename(scatterList.scatters[index]) + ".bqsr.bam",
                 dockerImage = dockerImages["gatk4"]
         }
     }
