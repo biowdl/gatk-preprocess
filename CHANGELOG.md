@@ -11,6 +11,8 @@ that users understand how the changes affect the new version.
 
 version 2.0.0-dev
 -----------------
++ Add proper copyright headers to WDL files. So the free software license
+  is clear to end users who wish to adapt and modify.
 + Remove redundant orderedscatters task. Ordering is now handled by the 
   scatterRegions task.
 + Remove option to recalibrate or not. The bam file is always recalibrated.
