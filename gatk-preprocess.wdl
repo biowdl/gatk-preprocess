@@ -36,9 +36,11 @@ workflow GatkPreprocess {
         Boolean splitSplicedReads = false
         File dbsnpVCF
         File dbsnpVCFIndex
+        # Added scatterSizeMillions to overcome Json max int limit
+        Int scatterSizeMillions = 1000
         # Scatter size is based on bases in the reference genome. The human genome is approx 3 billion base pairs
         # With a scatter size of 1 billion this will lead to ~3 scatters.
-        Int scatterSize = 1000000000
+        Int scatterSize = scatterSizeMillions * 1000000
         File? regions
         Map[String, String] dockerImages = {
           "picard":"quay.io/biocontainers/picard:2.20.5--0",
@@ -144,6 +146,8 @@ workflow GatkPreprocess {
         dbsnpVCFIndex: {description: "Index for dbSNP vcf.", category: "required"}
 
         scatterSize: {description: "The size of the scattered regions in bases. Scattering is used to speed up certain processes. The genome will be sseperated into multiple chunks (scatters) which will be processed in their own job, allowing for parallel processing. Higher values will result in a lower number of jobs. The optimal value here will depend on the available resources.",
+                      category: "advanced"}
+        scatterSizeMillions:{ description: "Same as scatterSize, but is multiplied by 1000000 to get scatterSize. This allows for setting larger values more easily",
                       category: "advanced"}
         regions: {description: "A bed file describing the regions to operate on.", category: "common"}
         dockerImages: {description: "The docker images used. Changing this may result in errors which the developers may choose not to address.",
