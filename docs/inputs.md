@@ -131,11 +131,6 @@ GatkPreprocess.
     <i>String </i><i>&mdash; Default:</i> <code>"12G"</code><br />
     The amount of memory this job will use.
 </dd>
-<dt id="GatkPreprocess.orderedScatters.dockerImage"><a href="#GatkPreprocess.orderedScatters.dockerImage">GatkPreprocess.orderedScatters.dockerImage</a></dt>
-<dd>
-    <i>String </i><i>&mdash; Default:</i> <code>"python:3.7-slim"</code><br />
-    The docker image used for this task. Changing this may result in errors which the developers may choose not to address.
-</dd>
 <dt id="GatkPreprocess.scatterList.bamFile"><a href="#GatkPreprocess.scatterList.bamFile">GatkPreprocess.scatterList.bamFile</a></dt>
 <dd>
     <i>File? </i><br />
@@ -158,8 +153,13 @@ GatkPreprocess.
 </dd>
 <dt id="GatkPreprocess.scatterSize"><a href="#GatkPreprocess.scatterSize">GatkPreprocess.scatterSize</a></dt>
 <dd>
-    <i>Int </i><i>&mdash; Default:</i> <code>1000000000</code><br />
+    <i>Int </i><i>&mdash; Default:</i> <code>scatterSizeMillions * 1000000</code><br />
     The size of the scattered regions in bases. Scattering is used to speed up certain processes. The genome will be sseperated into multiple chunks (scatters) which will be processed in their own job, allowing for parallel processing. Higher values will result in a lower number of jobs. The optimal value here will depend on the available resources.
+</dd>
+<dt id="GatkPreprocess.scatterSizeMillions"><a href="#GatkPreprocess.scatterSizeMillions">GatkPreprocess.scatterSizeMillions</a></dt>
+<dd>
+    <i>Int </i><i>&mdash; Default:</i> <code>1000</code><br />
+    Same as scatterSize, but is multiplied by 1000000 to get scatterSize. This allows for setting larger values more easily
 </dd>
 <dt id="GatkPreprocess.splitNCigarReads.javaXmx"><a href="#GatkPreprocess.splitNCigarReads.javaXmx">GatkPreprocess.splitNCigarReads.javaXmx</a></dt>
 <dd>
