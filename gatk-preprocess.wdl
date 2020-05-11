@@ -62,8 +62,10 @@ workflow GatkPreprocess {
     }
 
     Boolean scattered = length(scatterList.scatters) > 1
+    String reportName = outputDir + "/" + bamName + ".bqsr"
 
     scatter (bed in scatterList.scatters) {
+        String scatteredReportName = scatterDir + "/" + basename(bed) + ".bqsr"
 
         if (splitSplicedReads) {
             call gatk.SplitNCigarReads as splitNCigarReads {
@@ -87,7 +89,7 @@ workflow GatkPreprocess {
                 referenceFastaDict = referenceFastaDict,
                 inputBam = select_first([splitNCigarReads.bam, bam]),
                 inputBamIndex = select_first([splitNCigarReads.bamIndex, bamIndex]),
-                recalibrationReportPath = scatterDir + "/" + basename(bed) + ".bqsr",
+                recalibrationReportPath = if scattered then scatteredReportName else reportName,
                 dbsnpVCF = dbsnpVCF,
                 dbsnpVCFIndex = dbsnpVCFIndex,
                 dockerImage = dockerImages["gatk4"]
@@ -99,7 +101,7 @@ workflow GatkPreprocess {
         call gatk.GatherBqsrReports as gatherBqsr {
             input:
                 inputBQSRreports = baseRecalibrator.recalibrationReport,
-                outputReportPath = outputDir + "/" + bamName + ".bqsr",
+                outputReportPath = reportName,
                 dockerImage = dockerImages["gatk4"]
         }
     }
