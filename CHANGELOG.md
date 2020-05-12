@@ -9,6 +9,10 @@ This document is user facing. Please word the changes in such a way
 that users understand how the changes affect the new version.
 -->
 
+version 2.1.0-dev
+-----------------
++ Only scatter when the number of scatters turns out to be 1.
+
 version 2.0.0
 -----------------
 + Add a scatterSizeMillions parameter to make it easier to set larger scatter 

@@ -61,7 +61,11 @@ workflow GatkPreprocess {
             dockerImage = dockerImages["biopet-scatterregions"]
     }
 
+    Boolean scattered = length(scatterList.scatters) > 1
+    String reportName = outputDir + "/" + bamName + ".bqsr"
+
     scatter (bed in scatterList.scatters) {
+        String scatteredReportName = scatterDir + "/" + basename(bed) + ".bqsr"
 
         if (splitSplicedReads) {
             call gatk.SplitNCigarReads as splitNCigarReads {
@@ -85,21 +89,31 @@ workflow GatkPreprocess {
                 referenceFastaDict = referenceFastaDict,
                 inputBam = select_first([splitNCigarReads.bam, bam]),
                 inputBamIndex = select_first([splitNCigarReads.bamIndex, bamIndex]),
-                recalibrationReportPath = scatterDir + "/" + basename(bed) + ".bqsr",
+                recalibrationReportPath = if scattered then scatteredReportName else reportName,
                 dbsnpVCF = dbsnpVCF,
                 dbsnpVCFIndex = dbsnpVCFIndex,
                 dockerImage = dockerImages["gatk4"]
         }
     }
 
-    call gatk.GatherBqsrReports as gatherBqsr {
-        input:
-            inputBQSRreports = baseRecalibrator.recalibrationReport,
-            outputReportPath = outputDir + "/" + bamName + ".bqsr",
-            dockerImage = dockerImages["gatk4"]
-    }
 
+    if (scattered) {
+        call gatk.GatherBqsrReports as gatherBqsr {
+            input:
+                inputBQSRreports = baseRecalibrator.recalibrationReport,
+                outputReportPath = reportName,
+                dockerImage = dockerImages["gatk4"]
+        }
+    }
+    File recalibrationReport = select_first([gatherBqsr.outputBQSRreport, baseRecalibrator.recalibrationReport[0]])
+     
+    String recalibratedBamName = outputDir + "/" + bamName + ".bam"
+    
     scatter (index in range(length(scatterList.scatters))) {
+        String scatterBamName = if splitSplicedReads
+                    then scatterDir + "/" + basename(scatterList.scatters[index]) + ".split.bqsr.bam"
+                    else scatterDir + "/" + basename(scatterList.scatters[index]) + ".bqsr.bam"
+
         call gatk.ApplyBQSR as applyBqsr {
             input:
                 sequenceGroupInterval = [scatterList.scatters[index]],
@@ -108,27 +122,26 @@ workflow GatkPreprocess {
                 referenceFastaDict = referenceFastaDict,
                 inputBam = select_first([splitNCigarReads.bam[index], bam]),
                 inputBamIndex = select_first([splitNCigarReads.bamIndex[index], bamIndex]),
-                recalibrationReport = gatherBqsr.outputBQSRreport,
-                outputBamPath = if splitSplicedReads
-                    then scatterDir + "/" + basename(scatterList.scatters[index]) + ".split.bqsr.bam"
-                    else scatterDir + "/" + basename(scatterList.scatters[index]) + ".bqsr.bam",
+                recalibrationReport = recalibrationReport,
+                outputBamPath = if scattered then scatterBamName else recalibratedBamName,
                 dockerImage = dockerImages["gatk4"]
         }
     }
 
-
-    call picard.GatherBamFiles as gatherBamFiles {
-        input:
-            inputBams = applyBqsr.recalibratedBam,
-            inputBamsIndex = applyBqsr.recalibratedBamIndex,
-            outputBamPath = outputDir + "/" + bamName + ".bam",
-            dockerImage = dockerImages["picard"]
+    if (scattered) {
+        call picard.GatherBamFiles as gatherBamFiles {
+            input:
+                inputBams = applyBqsr.recalibratedBam,
+                inputBamsIndex = applyBqsr.recalibratedBamIndex,
+                outputBamPath = outputDir + "/" + bamName + ".bam",
+                dockerImage = dockerImages["picard"]
+        }
     }
 
     output {
-        File recalibratedBam = gatherBamFiles.outputBam
-        File recalibratedBamIndex = gatherBamFiles.outputBamIndex
-        File BQSRreport = gatherBqsr.outputBQSRreport
+        File recalibratedBam = select_first([gatherBamFiles.outputBam, applyBqsr.recalibratedBam[0]])
+        File recalibratedBamIndex = select_first([gatherBamFiles.outputBamIndex, applyBqsr.recalibratedBamIndex[0]])
+        File BQSRreport = recalibrationReport
     }
 
     parameter_meta {
