@@ -11,7 +11,11 @@ that users understand how the changes affect the new version.
 
 version 2.1.0-dev
 -----------------
++ Tasks were updated to contain the `time_minutes` runtime attribute and
+  associated `timeMinutes` input, describing the maximum time the task will
+  take to run.
 + Only scatter when the number of scatters turns out to be 1.
+
 
 version 2.0.0
 -----------------
