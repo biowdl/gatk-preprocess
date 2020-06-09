@@ -60,8 +60,12 @@ workflow GatkPreprocess {
             regions = regions,
             dockerImage = dockerImages["biopet-scatterregions"]
     }
+    Int scatterNumber = length(scatterList.scatters)
+    Int splitNCigarTimeEstimate = 10 + ceil(size(bam, "G") * 12 / scatterNumber)
+    Int baseRecalibratorTimeEstimate = splitNCigarTimeEstimate
+    Int applyBqsrTimeEstimate = splitNCigarTimeEstimate
 
-    Boolean scattered = length(scatterList.scatters) > 1
+    Boolean scattered = scatterNumber > 1
     String reportName = outputDir + "/" + bamName + ".bqsr"
 
     scatter (bed in scatterList.scatters) {
@@ -77,7 +81,8 @@ workflow GatkPreprocess {
                     inputBam = bam,
                     inputBamIndex = bamIndex,
                     outputBam = scatterDir + "/" + basename(bed) + ".split.bam",
-                    dockerImage = dockerImages["gatk4"]
+                    dockerImage = dockerImages["gatk4"],
+                    timeMinutes = splitNCigarTimeEstimate
             }
         }
 
@@ -92,7 +97,8 @@ workflow GatkPreprocess {
                 recalibrationReportPath = if scattered then scatteredReportName else reportName,
                 dbsnpVCF = dbsnpVCF,
                 dbsnpVCFIndex = dbsnpVCFIndex,
-                dockerImage = dockerImages["gatk4"]
+                dockerImage = dockerImages["gatk4"],
+                timeMinutes = baseRecalibratorTimeEstimate
         }
     }
 
@@ -124,7 +130,8 @@ workflow GatkPreprocess {
                 inputBamIndex = select_first([splitNCigarReads.bamIndex[index], bamIndex]),
                 recalibrationReport = recalibrationReport,
                 outputBamPath = if scattered then scatterBamName else recalibratedBamName,
-                dockerImage = dockerImages["gatk4"]
+                dockerImage = dockerImages["gatk4"],
+                timeMinutes = applyBqsrTimeEstimate
         }
     }
 
