@@ -40,7 +40,7 @@ workflow GatkPreprocess {
         Int scatterSizeMillions = 1000
         # Scatter size is based on bases in the reference genome. The human genome is approx 3 billion base pairs
         # With a scatter size of 1 billion this will lead to ~3 scatters.
-        Int scatterSize = scatterSizeMillions * 1000000
+        Int? scatterSize
         File? regions
         Map[String, String] dockerImages = {
           "picard":"quay.io/biocontainers/picard:2.20.5--0",
@@ -55,6 +55,7 @@ workflow GatkPreprocess {
         input:
             referenceFasta = referenceFasta,
             referenceFastaDict = referenceFastaDict,
+            scatterSizeMillions = scatterSizeMillions,
             scatterSize = scatterSize,
             notSplitContigs = true,
             regions = regions,
