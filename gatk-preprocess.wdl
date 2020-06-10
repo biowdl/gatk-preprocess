@@ -20,7 +20,6 @@ version 1.0
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import "tasks/biopet/biopet.wdl" as biopet
 import "tasks/gatk.wdl" as gatk
 import "tasks/picard.wdl" as picard
 
@@ -36,13 +35,8 @@ workflow GatkPreprocess {
         Boolean splitSplicedReads = false
         File dbsnpVCF
         File dbsnpVCFIndex
-        # Added scatterSizeMillions to overcome Json max int limit
-        Int scatterSizeMillions = 1000
-        # Scatter size is based on bases in the reference genome. The human genome is approx 3 billion base pairs
-        # With a scatter size of 1 billion this will lead to ~3 scatters.
-        Int? scatterSize
         File? regions
-        Array[File]? scatters
+        Array[File] scatters
         Map[String, String] dockerImages = {
           "picard":"quay.io/biocontainers/picard:2.20.5--0",
           "gatk4":"quay.io/biocontainers/gatk4:4.1.0.0--0",
@@ -52,21 +46,7 @@ workflow GatkPreprocess {
 
     String scatterDir = outputDir +  "/gatk_preprocess_scatter/"
 
-    if (!defined(scatters)) { 
-        call biopet.ScatterRegions as scatterList {
-            input:
-                referenceFasta = referenceFasta,
-                referenceFastaDict = referenceFastaDict,
-                scatterSizeMillions = scatterSizeMillions,
-                scatterSize = scatterSize,
-                notSplitContigs = true,
-                regions = regions,
-                dockerImage = dockerImages["biopet-scatterregions"]
-
-        }
-    }
-    Array[File] finalScatters = select_first([scatterList.scatters, scatters])
-    Int scatterNumber = length(finalScatters)
+    Int scatterNumber = length(scatters)
     Int splitNCigarTimeEstimate = 10 + ceil(size(bam, "G") * 12 / scatterNumber)
     Int baseRecalibratorTimeEstimate = splitNCigarTimeEstimate
     Int applyBqsrTimeEstimate = splitNCigarTimeEstimate
@@ -74,7 +54,7 @@ workflow GatkPreprocess {
     Boolean scattered = scatterNumber > 1
     String reportName = outputDir + "/" + bamName + ".bqsr"
 
-    scatter (bed in finalScatters) {
+    scatter (bed in scatters) {
         String scatteredReportName = scatterDir + "/" + basename(bed) + ".bqsr"
 
         if (splitSplicedReads) {
@@ -121,14 +101,14 @@ workflow GatkPreprocess {
      
     String recalibratedBamName = outputDir + "/" + bamName + ".bam"
     
-    scatter (index in range(length(finalScatters))) {
+    scatter (index in range(length(scatters))) {
         String scatterBamName = if splitSplicedReads
-                    then scatterDir + "/" + basename(finalScatters[index]) + ".split.bqsr.bam"
-                    else scatterDir + "/" + basename(finalScatters[index]) + ".bqsr.bam"
+                    then scatterDir + "/" + basename(scatters[index]) + ".split.bqsr.bam"
+                    else scatterDir + "/" + basename(scatters[index]) + ".bqsr.bam"
 
         call gatk.ApplyBQSR as applyBqsr {
             input:
-                sequenceGroupInterval = [finalScatters[index]],
+                sequenceGroupInterval = [scatters[index]],
                 referenceFasta = referenceFasta,
                 referenceFastaFai = referenceFastaFai,
                 referenceFastaDict = referenceFastaDict,
@@ -171,11 +151,7 @@ workflow GatkPreprocess {
         dbsnpVCF: {description: "A dbSNP vcf.", category: "required"}
         dbsnpVCFIndex: {description: "Index for dbSNP vcf.", category: "required"}
 
-        scatterSize: {description: "The size of the scattered regions in bases. Scattering is used to speed up certain processes. The genome will be sseperated into multiple chunks (scatters) which will be processed in their own job, allowing for parallel processing. Higher values will result in a lower number of jobs. The optimal value here will depend on the available resources.",
-                      category: "advanced"}
-        scatterSizeMillions:{ description: "Same as scatterSize, but is multiplied by 1000000 to get scatterSize. This allows for setting larger values more easily",
-                      category: "advanced"}
-        regions: {description: "A bed file describing the regions to operate on.", category: "common"}
+        scatters: {description: "The bed files to be used"}
         dockerImages: {description: "The docker images used. Changing this may result in errors which the developers may choose not to address.",
                        category: "advanced"}
     }

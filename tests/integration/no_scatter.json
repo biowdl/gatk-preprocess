@@ -6,7 +6,7 @@
   "GatkPreprocess.bamIndex": "tests/data/wgs1.bai",
   "GatkPreprocess.dbsnpVCF": "tests/data/wgs2.vcf.gz",
   "GatkPreprocess.dbsnpVCFIndex": "tests/data/wgs2.vcf.gz.tbi",
-  "GatkPreprocess.scatterSize": 5000000,
+  "GatkPreprocess.scatters": ["tests/data/scatters/all_regions.bed"],
   "GatkPreprocess.splitSplicedReads": true,
   "GatkPreprocess.bamName": "test"
 }
