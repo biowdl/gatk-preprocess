@@ -42,6 +42,7 @@ workflow GatkPreprocess {
         # With a scatter size of 1 billion this will lead to ~3 scatters.
         Int? scatterSize
         File? regions
+        Array[File]? scatters
         Map[String, String] dockerImages = {
           "picard":"quay.io/biocontainers/picard:2.20.5--0",
           "gatk4":"quay.io/biocontainers/gatk4:4.1.0.0--0",
@@ -51,17 +52,21 @@ workflow GatkPreprocess {
 
     String scatterDir = outputDir +  "/gatk_preprocess_scatter/"
 
-    call biopet.ScatterRegions as scatterList {
-        input:
-            referenceFasta = referenceFasta,
-            referenceFastaDict = referenceFastaDict,
-            scatterSizeMillions = scatterSizeMillions,
-            scatterSize = scatterSize,
-            notSplitContigs = true,
-            regions = regions,
-            dockerImage = dockerImages["biopet-scatterregions"]
+    if (!defined(scatters)) { 
+        call biopet.ScatterRegions as scatterList {
+            input:
+                referenceFasta = referenceFasta,
+                referenceFastaDict = referenceFastaDict,
+                scatterSizeMillions = scatterSizeMillions,
+                scatterSize = scatterSize,
+                notSplitContigs = true,
+                regions = regions,
+                dockerImage = dockerImages["biopet-scatterregions"]
+
+        }
     }
-    Int scatterNumber = length(scatterList.scatters)
+    Array[File] finalScatters = select_first([scatterList.scatters, scatters])
+    Int scatterNumber = length(finalScatters)
     Int splitNCigarTimeEstimate = 10 + ceil(size(bam, "G") * 12 / scatterNumber)
     Int baseRecalibratorTimeEstimate = splitNCigarTimeEstimate
     Int applyBqsrTimeEstimate = splitNCigarTimeEstimate
@@ -69,7 +74,7 @@ workflow GatkPreprocess {
     Boolean scattered = scatterNumber > 1
     String reportName = outputDir + "/" + bamName + ".bqsr"
 
-    scatter (bed in scatterList.scatters) {
+    scatter (bed in finalScatters) {
         String scatteredReportName = scatterDir + "/" + basename(bed) + ".bqsr"
 
         if (splitSplicedReads) {
@@ -116,14 +121,14 @@ workflow GatkPreprocess {
      
     String recalibratedBamName = outputDir + "/" + bamName + ".bam"
     
-    scatter (index in range(length(scatterList.scatters))) {
+    scatter (index in range(length(finalScatters))) {
         String scatterBamName = if splitSplicedReads
-                    then scatterDir + "/" + basename(scatterList.scatters[index]) + ".split.bqsr.bam"
-                    else scatterDir + "/" + basename(scatterList.scatters[index]) + ".bqsr.bam"
+                    then scatterDir + "/" + basename(finalScatters[index]) + ".split.bqsr.bam"
+                    else scatterDir + "/" + basename(finalScatters[index]) + ".bqsr.bam"
 
         call gatk.ApplyBQSR as applyBqsr {
             input:
-                sequenceGroupInterval = [scatterList.scatters[index]],
+                sequenceGroupInterval = [finalScatters[index]],
                 referenceFasta = referenceFasta,
                 referenceFastaFai = referenceFastaFai,
                 referenceFastaDict = referenceFastaDict,
