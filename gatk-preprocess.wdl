@@ -35,7 +35,6 @@ workflow GatkPreprocess {
         Boolean splitSplicedReads = false
         File dbsnpVCF
         File dbsnpVCFIndex
-        File? regions
         Array[File] scatters
         Map[String, String] dockerImages = {
           "picard":"quay.io/biocontainers/picard:2.20.5--0",
