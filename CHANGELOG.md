@@ -9,8 +9,11 @@ This document is user facing. Please word the changes in such a way
 that users understand how the changes affect the new version.
 -->
 
-version 2.1.0-dev
+version 3.0.0-dev
 -----------------
++ The scatter regions has been removed. Regions for scattering need to be 
+  provided externally. This is more efficient for pipelines that work on 
+  multiple samples.
 + Tasks were updated to contain the `time_minutes` runtime attribute and
   associated `timeMinutes` input, describing the maximum time the task will
   take to run.
