@@ -49,7 +49,7 @@ workflow GatkPreprocess {
     Int baseRecalibratorTimeEstimate = 10 + ceil(size(bam, "G") * 12 / scatterNumber)
     # splitNCigar does two passes and is a lot slower.
     Int splitNCigarTimeEstimate = 6 * baseRecalibratorTimeEstimate
-    Int applyBqsrTimeEstimate = splitNCigarTimeEstimate
+    Int applyBqsrTimeEstimate = baseRecalibratorTimeEstimate
 
     Boolean scattered = scatterNumber > 1
     String reportName = outputDir + "/" + bamName + ".bqsr"
