@@ -47,8 +47,8 @@ workflow GatkPreprocess {
 
     Int scatterNumber = length(scatters)
     Int baseRecalibratorTimeEstimate = 10 + ceil(size(bam, "G") * 12 / scatterNumber)
-    # splitNCigar does two passes.
-    Int splitNCigarTimeEstimate = 2 * baseRecalibratorTimeEstimate
+    # splitNCigar does two passes and is a lot slower.
+    Int splitNCigarTimeEstimate = 6 * baseRecalibratorTimeEstimate
     Int applyBqsrTimeEstimate = splitNCigarTimeEstimate
 
     Boolean scattered = scatterNumber > 1
