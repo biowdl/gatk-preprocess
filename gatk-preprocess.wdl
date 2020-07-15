@@ -42,6 +42,7 @@ workflow GatkPreprocess {
           "biopet-scatterregions":"quay.io/biocontainers/biopet-scatterregions:0.2--0"
         }
     }
+    meta {allowNestedInputs: true}
 
     String scatterDir = outputDir +  "/gatk_preprocess_scatter/"
 
