@@ -37,9 +37,8 @@ workflow GatkPreprocess {
         File dbsnpVCFIndex
         Array[File] scatters
         Map[String, String] dockerImages = {
-          "picard":"quay.io/biocontainers/picard:2.20.5--0",
-          "gatk4":"quay.io/biocontainers/gatk4:4.1.0.0--0",
-          "biopet-scatterregions":"quay.io/biocontainers/biopet-scatterregions:0.2--0"
+          "picard":"quay.io/biocontainers/picard:2.23.2--0",
+          "gatk4": "quay.io/biocontainers/gatk4:4.1.8.0--py38h37ae868_0"
         }
     }
     meta {allowNestedInputs: true}
