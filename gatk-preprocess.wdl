@@ -46,7 +46,7 @@ workflow GatkPreprocess {
     String scatterDir = outputDir +  "/gatk_preprocess_scatter/"
 
     Int scatterNumber = length(scatters)
-    Int baseRecalibratorTimeEstimate = 10 + ceil(size(bam, "G") * 24 / scatterNumber)
+    Int baseRecalibratorTimeEstimate = 10 + ceil(size(bam, "G") * 36 / scatterNumber)
     # splitNCigar does two passes and is a lot slower.
     Int splitNCigarTimeEstimate = 4 * baseRecalibratorTimeEstimate
     Int applyBqsrTimeEstimate = baseRecalibratorTimeEstimate
