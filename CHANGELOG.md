@@ -11,6 +11,7 @@ that users understand how the changes affect the new version.
 
 version 3.0.0-dev
 -----------------
++ Increase the time needed for baserecalibration
 + Update default docker images.
 + The scatter regions has been removed. Regions for scattering need to be 
   provided externally. This is more efficient for pipelines that work on 
