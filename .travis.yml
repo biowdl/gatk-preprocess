@@ -26,7 +26,8 @@ stages:
 stage: test
 
 install:
-  - conda install --file requirements-test.txt
+  - conda create -y -n test --file requirements-test.txt
+  - source activate test
 
 script:
   - pytest --keep-workflow-wd-on-fail --tag $TEST tests/
