@@ -46,6 +46,11 @@ GatkPreprocess.
     <i>File </i><br />
     Fasta index (.fai) for the reference fasta file
 </dd>
+<dt id="GatkPreprocess.scatters"><a href="#GatkPreprocess.scatters">GatkPreprocess.scatters</a></dt>
+<dd>
+    <i>Array[File] </i><br />
+    The bed files to be used
+</dd>
 </dl>
 
 ## Other common inputs
@@ -60,11 +65,6 @@ GatkPreprocess.
     <i>String </i><i>&mdash; Default:</i> <code>"."</code><br />
     The directory to which the outputs will be written.
 </dd>
-<dt id="GatkPreprocess.regions"><a href="#GatkPreprocess.regions">GatkPreprocess.regions</a></dt>
-<dd>
-    <i>File? </i><br />
-    A bed file describing the regions to operate on.
-</dd>
 <dt id="GatkPreprocess.splitSplicedReads"><a href="#GatkPreprocess.splitSplicedReads">GatkPreprocess.splitSplicedReads</a></dt>
 <dd>
     <i>Boolean </i><i>&mdash; Default:</i> <code>false</code><br />
@@ -76,20 +76,20 @@ GatkPreprocess.
 <details>
 <summary> Show/Hide </summary>
 <dl>
-<dt id="GatkPreprocess.applyBqsr.javaXmx"><a href="#GatkPreprocess.applyBqsr.javaXmx">GatkPreprocess.applyBqsr.javaXmx</a></dt>
+<dt id="GatkPreprocess.applyBqsr.javaXmxMb"><a href="#GatkPreprocess.applyBqsr.javaXmxMb">GatkPreprocess.applyBqsr.javaXmxMb</a></dt>
 <dd>
-    <i>String </i><i>&mdash; Default:</i> <code>"4G"</code><br />
-    The maximum memory available to the program. Should be lower than `memory` to accommodate JVM overhead.
+    <i>Int </i><i>&mdash; Default:</i> <code>2048</code><br />
+    The maximum memory available to the program in megabytes. Should be lower than `memoryMb` to accommodate JVM overhead.
 </dd>
-<dt id="GatkPreprocess.applyBqsr.memory"><a href="#GatkPreprocess.applyBqsr.memory">GatkPreprocess.applyBqsr.memory</a></dt>
+<dt id="GatkPreprocess.applyBqsr.memoryMb"><a href="#GatkPreprocess.applyBqsr.memoryMb">GatkPreprocess.applyBqsr.memoryMb</a></dt>
 <dd>
-    <i>String </i><i>&mdash; Default:</i> <code>"12G"</code><br />
-    The amount of memory this job will use.
+    <i>Int </i><i>&mdash; Default:</i> <code>javaXmxMb + 512</code><br />
+    The amount of memory this job will use in megabytes.
 </dd>
-<dt id="GatkPreprocess.baseRecalibrator.javaXmx"><a href="#GatkPreprocess.baseRecalibrator.javaXmx">GatkPreprocess.baseRecalibrator.javaXmx</a></dt>
+<dt id="GatkPreprocess.baseRecalibrator.javaXmxMb"><a href="#GatkPreprocess.baseRecalibrator.javaXmxMb">GatkPreprocess.baseRecalibrator.javaXmxMb</a></dt>
 <dd>
-    <i>String </i><i>&mdash; Default:</i> <code>"4G"</code><br />
-    The maximum memory available to the program. Should be lower than `memory` to accommodate JVM overhead.
+    <i>Int </i><i>&mdash; Default:</i> <code>1024</code><br />
+    The maximum memory available to the program in megabytes. Should be lower than `memoryMb` to accommodate JVM overhead.
 </dd>
 <dt id="GatkPreprocess.baseRecalibrator.knownIndelsSitesVCFIndexes"><a href="#GatkPreprocess.baseRecalibrator.knownIndelsSitesVCFIndexes">GatkPreprocess.baseRecalibrator.knownIndelsSitesVCFIndexes</a></dt>
 <dd>
@@ -101,65 +101,55 @@ GatkPreprocess.
     <i>Array[File] </i><i>&mdash; Default:</i> <code>[]</code><br />
     VCF files with known indels.
 </dd>
-<dt id="GatkPreprocess.baseRecalibrator.memory"><a href="#GatkPreprocess.baseRecalibrator.memory">GatkPreprocess.baseRecalibrator.memory</a></dt>
+<dt id="GatkPreprocess.baseRecalibrator.memoryMb"><a href="#GatkPreprocess.baseRecalibrator.memoryMb">GatkPreprocess.baseRecalibrator.memoryMb</a></dt>
 <dd>
-    <i>String </i><i>&mdash; Default:</i> <code>"12G"</code><br />
-    The amount of memory this job will use.
+    <i>Int </i><i>&mdash; Default:</i> <code>javaXmxMb + 512</code><br />
+    The amount of memory this job will use in megabytes.
 </dd>
 <dt id="GatkPreprocess.dockerImages"><a href="#GatkPreprocess.dockerImages">GatkPreprocess.dockerImages</a></dt>
 <dd>
-    <i>Map[String,String] </i><i>&mdash; Default:</i> <code>{"picard": "quay.io/biocontainers/picard:2.20.5--0", "gatk4": "quay.io/biocontainers/gatk4:4.1.0.0--0", "biopet-scatterregions": "quay.io/biocontainers/biopet-scatterregions:0.2--0"}</code><br />
+    <i>Map[String,String] </i><i>&mdash; Default:</i> <code>{"picard": "quay.io/biocontainers/picard:2.23.2--0", "gatk4": "quay.io/biocontainers/gatk4:4.1.8.0--py38h37ae868_0"}</code><br />
     The docker images used. Changing this may result in errors which the developers may choose not to address.
 </dd>
-<dt id="GatkPreprocess.gatherBamFiles.javaXmx"><a href="#GatkPreprocess.gatherBamFiles.javaXmx">GatkPreprocess.gatherBamFiles.javaXmx</a></dt>
+<dt id="GatkPreprocess.gatherBamFiles.compressionLevel"><a href="#GatkPreprocess.gatherBamFiles.compressionLevel">GatkPreprocess.gatherBamFiles.compressionLevel</a></dt>
 <dd>
-    <i>String </i><i>&mdash; Default:</i> <code>"4G"</code><br />
-    The maximum memory available to the program. Should be lower than `memory` to accommodate JVM overhead.
+    <i>Int? </i><br />
+    The compression level of the output BAM.
 </dd>
-<dt id="GatkPreprocess.gatherBamFiles.memory"><a href="#GatkPreprocess.gatherBamFiles.memory">GatkPreprocess.gatherBamFiles.memory</a></dt>
+<dt id="GatkPreprocess.gatherBamFiles.createMd5File"><a href="#GatkPreprocess.gatherBamFiles.createMd5File">GatkPreprocess.gatherBamFiles.createMd5File</a></dt>
 <dd>
-    <i>String </i><i>&mdash; Default:</i> <code>"12G"</code><br />
-    The amount of memory this job will use.
+    <i>Boolean </i><i>&mdash; Default:</i> <code>false</code><br />
+    ???
 </dd>
-<dt id="GatkPreprocess.gatherBqsr.javaXmx"><a href="#GatkPreprocess.gatherBqsr.javaXmx">GatkPreprocess.gatherBqsr.javaXmx</a></dt>
+<dt id="GatkPreprocess.gatherBamFiles.javaXmxMb"><a href="#GatkPreprocess.gatherBamFiles.javaXmxMb">GatkPreprocess.gatherBamFiles.javaXmxMb</a></dt>
 <dd>
-    <i>String </i><i>&mdash; Default:</i> <code>"4G"</code><br />
-    The maximum memory available to the program. Should be lower than `memory` to accommodate JVM overhead.
+    <i>Int </i><i>&mdash; Default:</i> <code>1024</code><br />
+    The maximum memory available to the program in megabytes. Should be lower than `memoryMb` to accommodate JVM overhead.
 </dd>
-<dt id="GatkPreprocess.gatherBqsr.memory"><a href="#GatkPreprocess.gatherBqsr.memory">GatkPreprocess.gatherBqsr.memory</a></dt>
+<dt id="GatkPreprocess.gatherBamFiles.memoryMb"><a href="#GatkPreprocess.gatherBamFiles.memoryMb">GatkPreprocess.gatherBamFiles.memoryMb</a></dt>
 <dd>
-    <i>String </i><i>&mdash; Default:</i> <code>"12G"</code><br />
-    The amount of memory this job will use.
+    <i>Int </i><i>&mdash; Default:</i> <code>javaXmxMb + 512</code><br />
+    The amount of memory this job will use in megabytes.
 </dd>
-<dt id="GatkPreprocess.scatterList.bamFile"><a href="#GatkPreprocess.scatterList.bamFile">GatkPreprocess.scatterList.bamFile</a></dt>
+<dt id="GatkPreprocess.gatherBamFiles.timeMinutes"><a href="#GatkPreprocess.gatherBamFiles.timeMinutes">GatkPreprocess.gatherBamFiles.timeMinutes</a></dt>
 <dd>
-    <i>File? </i><br />
-    Equivalent to biopet scatterregions' `--bamfile` option.
+    <i>Int </i><i>&mdash; Default:</i> <code>1 + ceil((size(inputBams,"G") * 1))</code><br />
+    The maximum amount of time the job will run in minutes.
 </dd>
-<dt id="GatkPreprocess.scatterList.bamIndex"><a href="#GatkPreprocess.scatterList.bamIndex">GatkPreprocess.scatterList.bamIndex</a></dt>
+<dt id="GatkPreprocess.gatherBqsr.javaXmxMb"><a href="#GatkPreprocess.gatherBqsr.javaXmxMb">GatkPreprocess.gatherBqsr.javaXmxMb</a></dt>
 <dd>
-    <i>File? </i><br />
-    The index for the bamfile given through bamFile.
+    <i>Int </i><i>&mdash; Default:</i> <code>256</code><br />
+    The maximum memory available to the program in megabytes. Should be lower than `memory` to accommodate JVM overhead.
 </dd>
-<dt id="GatkPreprocess.scatterList.javaXmx"><a href="#GatkPreprocess.scatterList.javaXmx">GatkPreprocess.scatterList.javaXmx</a></dt>
+<dt id="GatkPreprocess.gatherBqsr.memoryMb"><a href="#GatkPreprocess.gatherBqsr.memoryMb">GatkPreprocess.gatherBqsr.memoryMb</a></dt>
 <dd>
-    <i>String </i><i>&mdash; Default:</i> <code>"8G"</code><br />
-    The maximum memory available to the program. Should be lower than `memory` to accommodate JVM overhead.
+    <i>Int </i><i>&mdash; Default:</i> <code>256 + javaXmxMb</code><br />
+    The amount of memory this job will use in megabytes.
 </dd>
-<dt id="GatkPreprocess.scatterList.memory"><a href="#GatkPreprocess.scatterList.memory">GatkPreprocess.scatterList.memory</a></dt>
+<dt id="GatkPreprocess.gatherBqsr.timeMinutes"><a href="#GatkPreprocess.gatherBqsr.timeMinutes">GatkPreprocess.gatherBqsr.timeMinutes</a></dt>
 <dd>
-    <i>String </i><i>&mdash; Default:</i> <code>"24G"</code><br />
-    The amount of memory this job will use.
-</dd>
-<dt id="GatkPreprocess.scatterSize"><a href="#GatkPreprocess.scatterSize">GatkPreprocess.scatterSize</a></dt>
-<dd>
-    <i>Int </i><i>&mdash; Default:</i> <code>scatterSizeMillions * 1000000</code><br />
-    The size of the scattered regions in bases. Scattering is used to speed up certain processes. The genome will be sseperated into multiple chunks (scatters) which will be processed in their own job, allowing for parallel processing. Higher values will result in a lower number of jobs. The optimal value here will depend on the available resources.
-</dd>
-<dt id="GatkPreprocess.scatterSizeMillions"><a href="#GatkPreprocess.scatterSizeMillions">GatkPreprocess.scatterSizeMillions</a></dt>
-<dd>
-    <i>Int </i><i>&mdash; Default:</i> <code>1000</code><br />
-    Same as scatterSize, but is multiplied by 1000000 to get scatterSize. This allows for setting larger values more easily
+    <i>Int </i><i>&mdash; Default:</i> <code>1</code><br />
+    The maximum amount of time the job will run in minutes.
 </dd>
 <dt id="GatkPreprocess.splitNCigarReads.javaXmx"><a href="#GatkPreprocess.splitNCigarReads.javaXmx">GatkPreprocess.splitNCigarReads.javaXmx</a></dt>
 <dd>
@@ -168,7 +158,7 @@ GatkPreprocess.
 </dd>
 <dt id="GatkPreprocess.splitNCigarReads.memory"><a href="#GatkPreprocess.splitNCigarReads.memory">GatkPreprocess.splitNCigarReads.memory</a></dt>
 <dd>
-    <i>String </i><i>&mdash; Default:</i> <code>"16G"</code><br />
+    <i>String </i><i>&mdash; Default:</i> <code>"5G"</code><br />
     The amount of memory this job will use.
 </dd>
 </dl>
