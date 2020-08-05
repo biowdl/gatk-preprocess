@@ -44,13 +44,12 @@ Some additional inputs that may be of interest are:
   "GatkPreprocess.scatters": "A list of bed files describing the regions to be processed.",
   "GatkPreprocess.splitSplicedReads": "Whether or not SplitNCigarReads should be executed (recommended for RNA-seq data), defaults to false",
 }
-
+```
 Each bed file supplied with `scatters` will be used in a seperate job for
 most of the steps taken in this workflow. This will allow for parallelization
 if the backend used supports this. It is recommended to use this input and supply
 one bed file per chromosome (small chromosomes can be together in one bed file).
 
-```
 An output directory can be set using an `options.json` file. See [the
 cromwell documentation](
 https://cromwell.readthedocs.io/en/stable/wf_options/Overview/) for more
