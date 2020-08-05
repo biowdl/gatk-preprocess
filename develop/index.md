@@ -41,10 +41,14 @@ For an overview of all available inputs, see [this page](./inputs.html).
 Some additional inputs that may be of interest are:
 ```json
 {
-  "GatkPreprocess.scatterSize": "The size of scatter regions (see explanation of scattering below), defaults to 10,000,000",
+  "GatkPreprocess.scatters": "A list of bed files describing the regions to be processed.",
   "GatkPreprocess.splitSplicedReads": "Whether or not SplitNCigarReads should be executed (recommended for RNA-seq data), defaults to false",
-  "GatkPreprocess.scatterList.regions": "A bed file for which preprocessing will be performed"
 }
+
+Each bed file supplied with `scatters` will be used in a seperate job for
+most of the steps taken in this workflow. This will allow for parallelization
+if the backend used supports this. It is recommended to use this input and supply
+one bed file per chromosome (small chromosomes can be together in one bed file).
 
 ```
 An output directory can be set using an `options.json` file. See [the
