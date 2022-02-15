@@ -1,0 +1,6 @@
+[
+  "base",
+  "recalibrated_bam",
+  "split_n_cigar",
+  "split_n_cigar_recalibrated_bam"
+]
